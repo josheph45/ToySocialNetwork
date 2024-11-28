@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<SplitPane dividerPositions="0.5" orientation="VERTICAL" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.toysocialnetwork.controller.FriendsController">
+    <!-- Top Section -->
+    <items>
+        <SplitPane dividerPositions="0.5" orientation="HORIZONTAL">
+            <items>
+                <!-- Left Side: Users Table -->
+                <VBox prefWidth="300" spacing="10">
+                    <Label style="-fx-font-size: 16; -fx-font-weight: bold;" text="Users" />
+                    <TableView fx:id="usersTableView">
+                        <columns>
+                            <TableColumn fx:id="usernameColumn" prefWidth="90.0" text="Username" />
+                            <TableColumn fx:id="firstNameColumn" text="First Name" />
+                            <TableColumn fx:id="lastNameColumn" text="Last Name" />
+                        </columns>
+                    </TableView>
+                </VBox>
+
+                <!-- Right Side: Filter and Actions -->
+                <VBox alignment="CENTER" prefWidth="200" spacing="10">
+                    <TextField fx:id="filterTextField" promptText="Filter users by username...">
+                        <VBox.margin>
+                            <Insets left="30.0" right="30.0" />
+                        </VBox.margin>
+                    </TextField>
+                    <!-- Action Buttons -->
+                    <GridPane hgap="10" vgap="10" alignment="CENTER">
+                        <Button fx:id="sendFriendRequestButton" text="Send Friend Request" prefWidth="160.0" />
+                        <Button fx:id="acceptFriendRequestButton" text="Accept Friend Request" prefWidth="160.0" GridPane.rowIndex="1" />
+                        <Button fx:id="rejectFriendRequestButton" text="Reject Friend Request" prefWidth="160.0" GridPane.rowIndex="2" />
+                    </GridPane>
+                </VBox>
+            </items>
+        </SplitPane>
+
+        <!-- Bottom Section: Friends Table -->
+        <VBox spacing="10">
+            <Label style="-fx-font-size: 16; -fx-font-weight: bold;" text="Friends of User" />
+            <TableView fx:id="friendsTableView" maxWidth="370.0" prefHeight="200">
+                <columns>
+                    <TableColumn fx:id="friendUsernameColumn" prefWidth="90.0" text="Username" />
+                    <TableColumn fx:id="friendFirstNameColumn" text="First Name" />
+                    <TableColumn fx:id="friendLastNameColumn" text="Last Name" />
+                    <TableColumn fx:id="friendLastNameColumn1" prefWidth="120.0" text="Friends Since" />
+                </columns>
+            </TableView>
+        </VBox>
+    </items>
+</SplitPane>

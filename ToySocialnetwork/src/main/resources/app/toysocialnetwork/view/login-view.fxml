@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.toysocialnetwork.controller.LoginController"
+>
+    <children>
+        <VBox alignment="CENTER" layoutX="200.0" layoutY="100.0" spacing="10.0" AnchorPane.bottomAnchor="150.0" AnchorPane.leftAnchor="150.0" AnchorPane.rightAnchor="150.0" AnchorPane.topAnchor="150.0">
+            <children>
+                <Label text="Login" />
+                <TextField fx:id="usernameField" promptText="Enter username" />
+                <PasswordField fx:id="passwordField" promptText="Enter password" />
+                <Button fx:id="loginButton" onAction="#handleLogin" text="Login" />
+            </children>
+         <padding>
+            <Insets left="10.0" right="10.0" />
+         </padding>
+        </VBox>
+    </children>
+</AnchorPane>

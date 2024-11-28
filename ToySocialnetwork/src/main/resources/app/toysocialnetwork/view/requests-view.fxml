@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.toysocialnetwork.controller.RequestsController">
+    <children>
+        <TableView fx:id="requestsTable" layoutX="10.0" layoutY="10.0" prefWidth="580.0" prefHeight="380.0">
+            <columns>
+                <TableColumn fx:id="requesterUsernameColumn" text="Username" />
+                <TableColumn fx:id="requesterNameColumn" text="Name" />
+            </columns>
+        </TableView>
+    </children>
+</AnchorPane>
