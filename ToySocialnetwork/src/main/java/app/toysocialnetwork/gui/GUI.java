@@ -1,6 +1,7 @@
 package app.toysocialnetwork.gui;
 
 import app.toysocialnetwork.controller.*;
+import app.toysocialnetwork.domain.User;
 import app.toysocialnetwork.service.Service;
 import app.toysocialnetwork.repository.database.*;
 import app.toysocialnetwork.domain.validators.*;
@@ -62,13 +63,20 @@ public class GUI extends Application {
 
     private AnchorPane loadUsersView(Service service) throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/app/toysocialnetwork/view/users-view.fxml"));
+        FXMLLoader profileLoader = new FXMLLoader(getClass().getResource("/app/toysocialnetwork/view/profile-view.fxml"));
 
         // Load the view
         AnchorPane usersView = loader.load();
 
+        // Load the profile view
+        AnchorPane profileView = profileLoader.load();
+
         // Set up the controller
         UsersController usersController = loader.getController();
         usersController.setService(service);
+        usersController.setOnViewProfile(() -> {
+            openProfileWindow((Stage) usersView.getScene().getWindow(), service);
+        });
 
         return usersView;
     }
@@ -101,6 +109,43 @@ public class GUI extends Application {
 
         return mainView;
     }
+
+    private AnchorPane loadProfileView(Service service) throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/app/toysocialnetwork/view/profile-view.fxml"));
+
+        // Load the view
+        AnchorPane profileView = loader.load();
+
+        // Set up the controller
+        ProfileController profileController = loader.getController();
+        User selectedUser = service.getUserById(service.getSelectedUserId())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        profileController.setService(service, selectedUser);
+        profileController.setOnViewProfile(() -> {
+            openProfileWindow((Stage) profileView.getScene().getWindow(), service);
+        });
+
+        return profileView;
+    }
+
+    private void openProfileWindow(Stage stage, Service service) {
+        try {
+            // add the profile view to the stage, to the already existing tabs
+            AnchorPane profileView = loadProfileView(service);
+            Tab profileTab = new Tab("Profile");
+            profileTab.setContent(profileView);
+            profileTab.setClosable(true);
+
+            TabPane tabPane = (TabPane) stage.getScene().getRoot();
+            tabPane.getTabs().add(profileTab);
+
+            // select the profile tab
+            tabPane.getSelectionModel().select(profileTab);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     private void openLoginWindow(Stage primaryStage, Service service) {
         try {

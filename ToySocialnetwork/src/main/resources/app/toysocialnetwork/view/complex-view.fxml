@@ -4,7 +4,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<SplitPane dividerPositions="0.5" orientation="VERTICAL" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.toysocialnetwork.controller.FriendsController">
+<SplitPane dividerPositions="0.6" orientation="VERTICAL" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.toysocialnetwork.controller.FriendsController">
     <!-- Top Section -->
     <items>
         <SplitPane dividerPositions="0.5" orientation="HORIZONTAL">
@@ -29,10 +29,18 @@
                         </VBox.margin>
                     </TextField>
                     <!-- Action Buttons -->
-                    <GridPane hgap="10" vgap="10" alignment="CENTER">
-                        <Button fx:id="sendFriendRequestButton" text="Send Friend Request" prefWidth="160.0" />
-                        <Button fx:id="acceptFriendRequestButton" text="Accept Friend Request" prefWidth="160.0" GridPane.rowIndex="1" />
-                        <Button fx:id="rejectFriendRequestButton" text="Reject Friend Request" prefWidth="160.0" GridPane.rowIndex="2" />
+                    <GridPane alignment="CENTER" hgap="10" vgap="10">
+                        <Button fx:id="sendFriendRequestButton" prefWidth="160.0" text="Send Friend Request" />
+                        <Button fx:id="acceptFriendRequestButton" prefWidth="160.0" text="Accept Friend Request" GridPane.rowIndex="1" />
+                        <Button fx:id="rejectFriendRequestButton" prefWidth="160.0" text="Reject Friend Request" GridPane.rowIndex="2" />
+                  <columnConstraints>
+                     <ColumnConstraints />
+                  </columnConstraints>
+                  <rowConstraints>
+                     <RowConstraints />
+                     <RowConstraints />
+                     <RowConstraints />
+                  </rowConstraints>
                     </GridPane>
                 </VBox>
             </items>

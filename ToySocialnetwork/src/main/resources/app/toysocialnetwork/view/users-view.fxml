@@ -23,9 +23,11 @@
                 <!-- Users Table -->
                 <TableView fx:id="usersTableView" prefHeight="200.0" prefWidth="254.0">
                     <columns>
-                        <TableColumn fx:id="usernameColumn" prefWidth="140.0" text="Username" />
-                        <TableColumn fx:id="firstNameColumn" prefWidth="120.0" text="First Name" />
-                        <TableColumn fx:id="lastNameColumn" prefWidth="120.0" text="Last Name" />
+                        <TableColumn fx:id="usernameColumn" prefWidth="100.0" text="Username" />
+                        <TableColumn fx:id="firstNameColumn" prefWidth="100.0" text="First Name" />
+                        <TableColumn fx:id="lastNameColumn" prefWidth="100.0" text="Last Name" />
+                        <!-- Action Column -->
+                        <TableColumn fx:id="viewProfileColumn" text="Action" />
                     </columns>
                 </TableView>
             </children>

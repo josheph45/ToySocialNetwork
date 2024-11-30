@@ -28,6 +28,7 @@ public class Service implements UserObservable, FriendshipObservable, RequestObs
     private final List<Observer<RequestEvent>> requestObserver;
 
     private Long currentUserId;
+    private Long selectedUserId;
     private Long userIdCounter = 1L;
     private Long friendshipIdCounter = 1L;
     private Long requestIdCounter = 1L;
@@ -56,6 +57,14 @@ public class Service implements UserObservable, FriendshipObservable, RequestObs
 
     public void setCurrentUserId(Long currentUserId) {
         this.currentUserId = currentUserId;
+    }
+
+    public Long getSelectedUserId() {
+        return selectedUserId;
+    }
+
+    public void setSelectedUserId(Long selectedUserId) {
+        this.selectedUserId = selectedUserId;
     }
 
 

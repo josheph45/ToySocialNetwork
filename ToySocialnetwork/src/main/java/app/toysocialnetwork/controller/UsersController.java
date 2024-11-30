@@ -6,10 +6,7 @@ import app.toysocialnetwork.utils.event.EventEnum;
 import app.toysocialnetwork.utils.event.UserEvent;
 import app.toysocialnetwork.utils.observer.Observer;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -18,6 +15,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class UsersController implements Observer<UserEvent> {
+    private Runnable onViewProfile;
     private Service service;
     private ObservableList<User> usersList = FXCollections.observableArrayList();
 
@@ -45,11 +43,18 @@ public class UsersController implements Observer<UserEvent> {
     @FXML
     private TableColumn<User, String> lastNameColumn;
 
+    @FXML
+    private TableColumn<User, Void> viewProfileColumn;
+
     // Method to set up the service
     public void setService(Service service) {
         this.service = service;
         this.service.addUserObserver(this); // Subscribe to user updates
         loadUsers();  // Initial load of users
+    }
+
+    public void setOnViewProfile(Runnable onViewProfile) {
+        this.onViewProfile = onViewProfile;
     }
 
     @FXML
@@ -63,6 +68,8 @@ public class UsersController implements Observer<UserEvent> {
         filterUsernameField.textProperty().addListener((observable, oldValue, newValue) -> filterUsers());
         filterFirstNameField.textProperty().addListener((observable, oldValue, newValue) -> filterUsers());
         filterLastNameField.textProperty().addListener((observable, oldValue, newValue) -> filterUsers());
+
+        addViewProfileButtonToTable();  // Add the view profile button to the table
     }
 
     // Method to load the users from the service
@@ -89,6 +96,35 @@ public class UsersController implements Observer<UserEvent> {
                 .collect(Collectors.toList());
 
         usersList.setAll(filteredUsers);  // Update the table view with the filtered list
+    }
+
+    // Method to handle the user selection
+    @FXML
+    public void addViewProfileButtonToTable() {
+        viewProfileColumn.setCellFactory(param -> new TableCell<User, Void>() {
+            private final Button viewButton = new Button("View");
+            {
+                viewButton.setOnAction(event -> {
+                    User selectedUser = getTableView().getItems().get(getIndex());
+                    service.setSelectedUserId(selectedUser.getId());
+                    if (onViewProfile != null) {
+                        onViewProfile.run();
+                    } else {
+                        System.err.println("Error: onViewProfile is not set!");
+                    }
+                });
+            }
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setGraphic(null); // No button when the row is empty
+                } else {
+                    setGraphic(viewButton); // Show the button when there's a user
+                }
+            }
+        });
     }
 
     @Override
