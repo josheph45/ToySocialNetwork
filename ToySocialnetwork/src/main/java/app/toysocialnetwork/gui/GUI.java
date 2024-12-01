@@ -63,13 +63,9 @@ public class GUI extends Application {
 
     private AnchorPane loadUsersView(Service service) throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/app/toysocialnetwork/view/users-view.fxml"));
-        FXMLLoader profileLoader = new FXMLLoader(getClass().getResource("/app/toysocialnetwork/view/profile-view.fxml"));
 
         // Load the view
         AnchorPane usersView = loader.load();
-
-        // Load the profile view
-        AnchorPane profileView = profileLoader.load();
 
         // Set up the controller
         UsersController usersController = loader.getController();
@@ -92,6 +88,38 @@ public class GUI extends Application {
         friendsController.setService(service);
 
         return friendsView;
+    }
+
+    private AnchorPane loadRequestsView(Service service) throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/app/toysocialnetwork/view/requests-view.fxml"));
+
+        // Load the view
+        AnchorPane requestsView = loader.load();
+
+        // Set up the controller
+        RequestsController requestsController = loader.getController();
+        requestsController.setService(service);
+        requestsController.setOnViewProfile(() -> {
+            openProfileWindow((Stage) requestsView.getScene().getWindow(), service);
+        });
+
+        return requestsView;
+    }
+
+    private AnchorPane loadPendingsView(Service service) throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/app/toysocialnetwork/view/pendings-view.fxml"));
+
+        // Load the view
+        AnchorPane pendingsView = loader.load();
+
+        // Set up the controller
+        PendingsController pendingsController = loader.getController();
+        pendingsController.setService(service);
+        pendingsController.setOnViewProfile(() -> {
+            openProfileWindow((Stage) pendingsView.getScene().getWindow(), service);
+        });
+
+        return pendingsView;
     }
 
     private AnchorPane loadMainView(Service service) throws IOException {
@@ -186,6 +214,12 @@ public class GUI extends Application {
             // Load the friends view
             AnchorPane friendsView = loadFriendsView(service);
 
+            // Load the requests view
+            AnchorPane requestsView = loadRequestsView(service);
+
+            // Load the pendings view
+            AnchorPane pendingsView = loadPendingsView(service);
+
             // Create tabs
             Tab mainTab = new Tab("Main");
             mainTab.setContent(mainView);
@@ -199,9 +233,17 @@ public class GUI extends Application {
             friendsTab.setContent(friendsView);
             friendsTab.setClosable(false);
 
+            Tab requestsTab = new Tab("Requests");
+            requestsTab.setContent(requestsView);
+            requestsTab.setClosable(false);
+
+            Tab pendingsTab = new Tab("Pendings");
+            pendingsTab.setContent(pendingsView);
+            pendingsTab.setClosable(false);
+
             // Create the TabPane and add the tabs
             TabPane tabPane = new TabPane();
-            tabPane.getTabs().addAll(mainTab, usersTab, friendsTab);
+            tabPane.getTabs().addAll(mainTab, usersTab, friendsTab, requestsTab, pendingsTab);
 
             // Create the scene and show the stage
             Scene scene = new Scene(tabPane, 600, 400);

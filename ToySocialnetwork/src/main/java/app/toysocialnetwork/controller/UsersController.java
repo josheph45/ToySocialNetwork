@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 public class UsersController implements Observer<UserEvent> {
     private Runnable onViewProfile;
     private Service service;
-    private ObservableList<User> usersList = FXCollections.observableArrayList();
+    private final ObservableList<User> usersList = FXCollections.observableArrayList();
 
     // The TextFields used for filtering the users
     @FXML
@@ -46,11 +46,10 @@ public class UsersController implements Observer<UserEvent> {
     @FXML
     private TableColumn<User, Void> viewProfileColumn;
 
-    // Method to set up the service
     public void setService(Service service) {
         this.service = service;
-        this.service.addUserObserver(this); // Subscribe to user updates
-        loadUsers();  // Initial load of users
+        this.service.addUserObserver(this);
+        loadUsers();
     }
 
     public void setOnViewProfile(Runnable onViewProfile) {
@@ -59,46 +58,39 @@ public class UsersController implements Observer<UserEvent> {
 
     @FXML
     public void initialize() {
-        // Initialize TableView columns
         usernameColumn.setCellValueFactory(new PropertyValueFactory<>("username"));
         firstNameColumn.setCellValueFactory(new PropertyValueFactory<>("firstName"));
         lastNameColumn.setCellValueFactory(new PropertyValueFactory<>("lastName"));
 
-        // Add listeners to filter fields for live filtering
         filterUsernameField.textProperty().addListener((observable, oldValue, newValue) -> filterUsers());
         filterFirstNameField.textProperty().addListener((observable, oldValue, newValue) -> filterUsers());
         filterLastNameField.textProperty().addListener((observable, oldValue, newValue) -> filterUsers());
 
-        addViewProfileButtonToTable();  // Add the view profile button to the table
+        addViewProfileButtonToTable();
     }
 
-    // Method to load the users from the service
     private void loadUsers() {
         Iterable<User> users = service.getUsers();
         usersList.setAll((List<User>) users);
         usersTableView.setItems(usersList);
     }
 
-    // Method to filter users based on the values in the filter fields
     private void filterUsers() {
+        loadUsers();
+
         String usernameFilter = filterUsernameField.getText().toLowerCase();
         String firstNameFilter = filterFirstNameField.getText().toLowerCase();
         String lastNameFilter = filterLastNameField.getText().toLowerCase();
 
-        // Load users for every filter change
-        loadUsers();
-
-        // Otherwise, filter based on the input in the fields
         List<User> filteredUsers = usersList.stream()
                 .filter(user -> user.getUsername().toLowerCase().contains(usernameFilter))
                 .filter(user -> user.getFirstName().toLowerCase().contains(firstNameFilter))
                 .filter(user -> user.getLastName().toLowerCase().contains(lastNameFilter))
                 .collect(Collectors.toList());
 
-        usersList.setAll(filteredUsers);  // Update the table view with the filtered list
+        usersList.setAll(filteredUsers);
     }
 
-    // Method to handle the user selection
     @FXML
     public void addViewProfileButtonToTable() {
         viewProfileColumn.setCellFactory(param -> new TableCell<User, Void>() {
@@ -119,9 +111,9 @@ public class UsersController implements Observer<UserEvent> {
             protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
                 if (empty) {
-                    setGraphic(null); // No button when the row is empty
+                    setGraphic(null);
                 } else {
-                    setGraphic(viewButton); // Show the button when there's a user
+                    setGraphic(viewButton);
                 }
             }
         });
@@ -129,9 +121,8 @@ public class UsersController implements Observer<UserEvent> {
 
     @Override
     public void update(UserEvent userEvent) {
-        // Update the user list based on the event (e.g., when a user is added, removed, etc.)
         if (userEvent.getType() == EventEnum.RELOAD) {
-            loadUsers();  // Reload the list if the event is a reload
+            loadUsers();
         }
     }
 }

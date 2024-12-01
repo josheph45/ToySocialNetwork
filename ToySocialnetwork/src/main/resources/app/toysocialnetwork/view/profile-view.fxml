@@ -6,7 +6,7 @@
 
 <AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.toysocialnetwork.controller.ProfileController">
     <children>
-        <VBox alignment="TOP_CENTER" prefHeight="400.0" prefWidth="600.0" spacing="20">
+        <VBox alignment="TOP_CENTER" prefHeight="400.0" prefWidth="600.0" spacing="10.0">
             <children>
                 <!-- Title -->
                 <Label style="-fx-font-size: 18px; -fx-font-weight: bold;" text="Viewing profile of user:" />
@@ -21,9 +21,9 @@
                 </HBox>
 
                 <!-- Friends Table -->
-                <VBox alignment="CENTER" prefWidth="530.0" spacing="10">
+                <VBox alignment="CENTER" prefHeight="200.0" prefWidth="530.0" spacing="10">
                     <Label style="-fx-font-size: 16px;" text="Friends:" />
-                    <TableView fx:id="friendsTableView" prefHeight="250.0" prefWidth="535.0">
+                    <TableView fx:id="friendsTableView" prefHeight="230.0" prefWidth="535.0">
                         <columns>
                             <!-- Username Column -->
                             <TableColumn fx:id="usernameColumn" prefWidth="140.0" text="Username" />

@@ -34,20 +34,14 @@ public class MainController {
     }
 
     private void handleLogOut() {
-        // Perform log out logic
         System.out.println("Log Out button clicked");
-        // Call service method to log out user
         service.setCurrentUserId(null);
-        // Call onLogOut callback
         onLogOut.run();
     }
 
     private void handleDeleteAccount() {
-        // Perform delete account logic
         System.out.println("Delete Account button clicked");
-        // Call service method to delete account and log out user
         service.deleteUser(service.getCurrentUserId());
-        // Redirect to the login view or exit application
         onLogOut.run();
     }
 

@@ -40,13 +40,11 @@ public class RegisterController {
         String username = usernameField.getText();
         String password = passwordField.getText();
 
-        // Check if any fields are empty
         if (firstName.isEmpty() || lastName.isEmpty() || username.isEmpty() || password.isEmpty()) {
             showAlert("Registration Failed", "All fields are required!", Alert.AlertType.ERROR);
             return;
         }
 
-        // Check if the username already exists using the Service class
         if (service.findUserByUsername(username).isPresent()) {
             showAlert("Registration Failed", "Username already exists!", Alert.AlertType.ERROR);
             return;
@@ -71,7 +69,6 @@ public class RegisterController {
     }
 
     private void clearFields() {
-        // Clear the input fields after successful registration
         firstNameField.clear();
         lastNameField.clear();
         usernameField.clear();

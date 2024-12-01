@@ -130,8 +130,6 @@ public class Service implements UserObservable, FriendshipObservable, RequestObs
     }
 
     public Optional<Friendship> addFriendship(Long userId1, Long userId2) {
-        // Ensure that a friendship is not duplicated
-        // do it without stream
         boolean friendshipExists = false;
         for (Friendship friendship : getFriendships()) {
             if ((friendship.getUser1Id().equals(userId1) && friendship.getUser2Id().equals(userId2)) ||
@@ -145,7 +143,6 @@ public class Service implements UserObservable, FriendshipObservable, RequestObs
             throw new IllegalStateException("A friendship already exists between these users.");
         }
 
-        // Create the friendship
         Friendship friendship = new Friendship(userId1, userId2, LocalDateTime.now());
         friendship.setId(friendshipIdCounter++);
         Optional<Friendship> savedFriendship = friendshipRepo.save(friendship);
@@ -176,11 +173,20 @@ public class Service implements UserObservable, FriendshipObservable, RequestObs
         return requestRepo.findAll();
     }
 
-    // returns the requests sent to the current user
+    public Iterable<Request> getRequestsByReceiver(Long receiverId) {
+        List<Request> requests = new ArrayList<>();
+        for (Request request : getRequests()) {
+            if (request.getReceiverId().equals(receiverId)) {
+                requests.add(request);
+            }
+        }
+        return requests;
+    }
+
     public Iterable<Request> getRequestsToUser(Long userId) {
         List<Request> requests = new ArrayList<>();
         for (Request request : getRequests()) {
-            if (request.getReceiverId().equals(userId)) {
+            if (request.getSenderId().equals(userId)) {
                 requests.add(request);
             }
         }
@@ -188,8 +194,6 @@ public class Service implements UserObservable, FriendshipObservable, RequestObs
     }
 
     public Optional<Request> addRequest(Long senderId, Long receiverId) {
-        // Check if a friendship already exists
-        // do it without stream
         boolean friendshipExists = false;
         for (Friendship friendship : getFriendships()) {
             if ((friendship.getUser1Id().equals(senderId) && friendship.getUser2Id().equals(receiverId)) ||
@@ -203,8 +207,6 @@ public class Service implements UserObservable, FriendshipObservable, RequestObs
             throw new IllegalStateException("A friendship already exists between these users.");
         }
 
-        // Check if the request already exists
-        // do it without stream
         boolean requestExists = false;
         for (Request request : getRequests()) {
             if (request.getSenderId().equals(senderId) && request.getReceiverId().equals(receiverId)) {
@@ -217,8 +219,6 @@ public class Service implements UserObservable, FriendshipObservable, RequestObs
             throw new IllegalStateException("A request already exists from user " + senderId + " to user " + receiverId);
         }
 
-        // Check if there is a reciprocal request (user2 -> user1)
-        // do it without stream
         Optional<Request> reciprocalRequest = Optional.empty();
         for (Request request : getRequests()) {
             if (request.getSenderId().equals(receiverId) && request.getReceiverId().equals(senderId)) {
@@ -228,14 +228,12 @@ public class Service implements UserObservable, FriendshipObservable, RequestObs
         }
 
         if (reciprocalRequest.isPresent()) {
-            // Create a friendship and delete both requests
             addFriendship(senderId, receiverId);
             requestRepo.delete(reciprocalRequest.get().getId());
             notifyRequestObservers(new RequestEvent(EventEnum.DELETE, reciprocalRequest.get()));
-            return Optional.empty(); // Return empty because no request is added (it becomes a friendship)
+            return Optional.empty();
         }
 
-        // Create the request if no issues are found
         Request request = new Request(senderId, receiverId);
         request.setId(requestIdCounter++);
         Optional<Request> savedRequest = requestRepo.save(request);

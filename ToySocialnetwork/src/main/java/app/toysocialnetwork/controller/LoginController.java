@@ -39,16 +39,13 @@ public class LoginController {
         String username = usernameField.getText();
         String password = passwordField.getText();
 
-        // Check if any fields are empty
         if (username.isEmpty() || password.isEmpty()) {
             showAlert("Login Failed", "All fields are required!", Alert.AlertType.ERROR);
             return;
         }
 
-        // Find the user by username
         Optional<User> user = service.findUserByUsername(username);
         if(user.isPresent()) {
-            // Check if the password is correct
             if(user.get().getPassword().equals(password)) {
                 showAlert("Login Successful", "Welcome " + username + "!", Alert.AlertType.INFORMATION);
                 service.setCurrentUserId(user.get().getId());
@@ -70,7 +67,6 @@ public class LoginController {
         }
     }
 
-    // Add a method to show an alert
     private void showAlert(String title, String content, Alert.AlertType type) {
         Alert alert = new Alert(type);
         alert.setTitle(title);
