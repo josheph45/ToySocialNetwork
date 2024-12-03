@@ -5,17 +5,15 @@ import app.toysocialnetwork.domain.User;
 public class UserEvent implements Event {
     private final EventEnum type;
     private final User newUser;
-    private User oldUser;
 
+    /**
+     * Constructor for UserEvent
+     * @param type the type of event
+     * @param newUser the new user
+     */
     public UserEvent(EventEnum type, User newUser) {
         this.type = type;
         this.newUser = newUser;
-    }
-
-    public UserEvent(EventEnum type, User newUser, User oldUser) {
-        this.type = type;
-        this.newUser = newUser;
-        this.oldUser = oldUser;
     }
 
     public EventEnum getType() {
@@ -24,9 +22,5 @@ public class UserEvent implements Event {
 
     public User getNewUser() {
         return newUser;
-    }
-
-    public User getOldUser() {
-        return oldUser;
     }
 }

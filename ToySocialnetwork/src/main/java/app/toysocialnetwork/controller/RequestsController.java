@@ -6,6 +6,7 @@ import app.toysocialnetwork.service.Service;
 import app.toysocialnetwork.utils.event.EventEnum;
 import app.toysocialnetwork.utils.event.RequestEvent;
 import app.toysocialnetwork.utils.observer.Observer;
+
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -19,11 +20,9 @@ public class RequestsController implements Observer<RequestEvent> {
     private Service service;
     private final ObservableList<Request> requestsList = FXCollections.observableArrayList();
 
-    // The table view to display the requests
     @FXML
     private TableView<Request> requestsTableView;
 
-    // The columns in the table view
     @FXML
     private TableColumn<Request, String> senderUsernameColumn;
 
@@ -36,16 +35,28 @@ public class RequestsController implements Observer<RequestEvent> {
     @FXML
     private TableColumn<Request, Void> rejectColumn;
 
+    /**
+     * Sets the service and adds the controller as an observer for request events.
+     * Loads the requests from the service.
+     * @param service the service to be set
+     */
     public void setService(Service service) {
         this.service = service;
         this.service.addRequestObserver(this);
         loadRequests();
     }
 
+    /**
+     * Sets the onViewProfile runnable.
+     * @param onViewProfile the runnable to be set
+     */
     public void setOnViewProfile(Runnable onViewProfile) {
         this.onViewProfile = onViewProfile;
     }
 
+    /**
+     * Initializes the columns of the table view.
+     */
     @FXML
     public void initialize() {
         senderUsernameColumn.setCellValueFactory(cellData -> {
@@ -64,23 +75,41 @@ public class RequestsController implements Observer<RequestEvent> {
         addRejectButtonToTable();
     }
 
+    /**
+     * Loads the requests from the service and sets them to the table view.
+     */
     private void loadRequests() {
         Iterable<Request> requests = service.getRequestsByReceiver(service.getCurrentUserId());
         requestsList.setAll((List<Request>) requests);
         requestsTableView.setItems(requestsList);
     }
 
+    /**
+     * Handles the accept request button action.
+     * Deletes the request from the service and adds a friendship between the sender and the receiver.
+     * Loads the requests.
+     * @param request the request to be accepted
+     */
     private void handleAcceptRequest(Request request) {
         service.deleteRequest(request.getId());
         service.addFriendship(request.getSenderId(), request.getReceiverId());
         loadRequests();
     }
 
+    /**
+     * Handles the reject request button action.
+     * Deletes the request from the service.
+     * Loads the requests.
+     * @param request the request to be rejected
+     */
     private void handleRejectRequest(Request request) {
         service.deleteRequest(request.getId());
         loadRequests();
     }
 
+    /**
+     * Adds a view profile button to the table view.
+     */
     @FXML
     public void addViewProfileButtonToTable() {
         viewProfileColumn.setCellFactory(param -> new TableCell<>() {
@@ -115,6 +144,10 @@ public class RequestsController implements Observer<RequestEvent> {
         });
     }
 
+    /**
+     * Adds an accept button to the table view.
+     */
+    @FXML
     private void addAcceptButtonToTable() {
         acceptColumn.setCellFactory(param -> new TableCell<>() {
             private final Button acceptButton = new Button("Accept");
@@ -137,6 +170,10 @@ public class RequestsController implements Observer<RequestEvent> {
         });
     }
 
+    /**
+     * Adds a reject button to the table view.
+     */
+    @FXML
     private void addRejectButtonToTable() {
         rejectColumn.setCellFactory(param -> new TableCell<>() {
             private final Button rejectButton = new Button("Reject");
@@ -160,6 +197,10 @@ public class RequestsController implements Observer<RequestEvent> {
         });
     }
 
+    /**
+     * Updates the requests list when a request event occurs.
+     * @param requestEvent the request event to be handled
+     */
     @Override
     public void update(RequestEvent requestEvent) {
         if (requestEvent.getType() == EventEnum.ADD) {

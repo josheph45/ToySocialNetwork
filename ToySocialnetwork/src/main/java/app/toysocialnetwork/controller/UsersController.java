@@ -5,6 +5,7 @@ import app.toysocialnetwork.service.Service;
 import app.toysocialnetwork.utils.event.EventEnum;
 import app.toysocialnetwork.utils.event.UserEvent;
 import app.toysocialnetwork.utils.observer.Observer;
+
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.collections.FXCollections;
@@ -19,7 +20,6 @@ public class UsersController implements Observer<UserEvent> {
     private Service service;
     private final ObservableList<User> usersList = FXCollections.observableArrayList();
 
-    // The TextFields used for filtering the users
     @FXML
     private TextField filterUsernameField;
 
@@ -29,11 +29,9 @@ public class UsersController implements Observer<UserEvent> {
     @FXML
     private TextField filterLastNameField;
 
-    // The TableView to display the users
     @FXML
     private TableView<User> usersTableView;
 
-    // The columns in the TableView
     @FXML
     private TableColumn<User, String> usernameColumn;
 
@@ -46,16 +44,30 @@ public class UsersController implements Observer<UserEvent> {
     @FXML
     private TableColumn<User, Void> viewProfileColumn;
 
+    /**
+     * Set the service for the controller
+     * @param service the service to be set
+     */
     public void setService(Service service) {
         this.service = service;
         this.service.addUserObserver(this);
         loadUsers();
     }
 
+    /**
+     * Set the onViewProfile runnable
+     * @param onViewProfile the runnable to be set
+     */
     public void setOnViewProfile(Runnable onViewProfile) {
         this.onViewProfile = onViewProfile;
     }
 
+    /**
+     * Initialize the controller
+     * Set the cell value factories for the table columns
+     * Add listeners to the filter fields
+     * Add a view profile button to the table
+     */
     @FXML
     public void initialize() {
         usernameColumn.setCellValueFactory(new PropertyValueFactory<>("username"));
@@ -69,12 +81,18 @@ public class UsersController implements Observer<UserEvent> {
         addViewProfileButtonToTable();
     }
 
+    /**
+     * Load the users from the service
+     */
     private void loadUsers() {
         Iterable<User> users = service.getUsers();
         usersList.setAll((List<User>) users);
         usersTableView.setItems(usersList);
     }
 
+    /**
+     * Filter the users based on the filter fields
+     */
     private void filterUsers() {
         loadUsers();
 
@@ -91,6 +109,9 @@ public class UsersController implements Observer<UserEvent> {
         usersList.setAll(filteredUsers);
     }
 
+    /**
+     * Add a view profile button to the table
+     */
     @FXML
     public void addViewProfileButtonToTable() {
         viewProfileColumn.setCellFactory(param -> new TableCell<User, Void>() {
@@ -119,6 +140,10 @@ public class UsersController implements Observer<UserEvent> {
         });
     }
 
+    /**
+     * Update the users list when a user event is received
+     * @param userEvent the user event
+     */
     @Override
     public void update(UserEvent userEvent) {
         if (userEvent.getType() == EventEnum.RELOAD) {

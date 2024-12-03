@@ -6,6 +6,7 @@ import app.toysocialnetwork.service.Service;
 import app.toysocialnetwork.utils.event.EventEnum;
 import app.toysocialnetwork.utils.event.FriendshipEvent;
 import app.toysocialnetwork.utils.observer.Observer;
+
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -21,15 +22,12 @@ public class FriendsController implements Observer<FriendshipEvent> {
     private Service service;
     private final ObservableList<Friendship> friendsList = FXCollections.observableArrayList();
 
-    // The TextFields used for filtering the friendships
     @FXML
     private TextField filterUsernameField;
 
-    // The TableView to display the friendships
     @FXML
     private TableView<Friendship> friendsTableView;
 
-    // The columns in the TableView
     @FXML
     private TableColumn<Friendship, String> friendUsernameColumn;
 
@@ -39,12 +37,22 @@ public class FriendsController implements Observer<FriendshipEvent> {
     @FXML
     private TableColumn<Friendship, Void> deleteColumn;
 
+    /**
+     * Set the service and add this controller as an observer for friendship events.
+     * Load the friendships of the current user.
+     * @param service the service to be set
+     */
     public void setService(Service service) {
         this.service = service;
         this.service.addFriendshipObserver(this);
         loadFriendships();
     }
 
+    /**
+     * Initialize the columns of the table view.
+     * Add a listener to the filter text field to filter the friendships by username.
+     * Add a delete button to the table view.
+     */
     @FXML
     public void initialize() {
         friendUsernameColumn.setCellValueFactory(cellData -> {
@@ -70,18 +78,29 @@ public class FriendsController implements Observer<FriendshipEvent> {
         filterUsernameField.textProperty().addListener((observable, oldValue, newValue) -> filterFriendships());
     }
 
-
+    /**
+     * Load the friendships of the current user and set them to the table view.
+     */
     private void loadFriendships() {
         Iterable<Friendship> friendships = service.getFriendshipsOfUser(service.getCurrentUserId());
         friendsList.setAll((List<Friendship>) friendships);
         friendsTableView.setItems(friendsList);
     }
 
+    /**
+     * Handle the deletion of a friendship.
+     * Delete the friendship from the database and reload the friendships.
+     * @param friendship the friendship to be deleted
+     */
     private void handleDeleteFriend(Friendship friendship) {
         service.deleteFriendship(friendship.getId());
         loadFriendships();
     }
 
+    /**
+     * Filter the friendships by the username entered in the filter text field.
+     * The friendships are filtered by the username of the friend.
+     */
     private void filterFriendships() {
         loadFriendships();
 
@@ -103,6 +122,10 @@ public class FriendsController implements Observer<FriendshipEvent> {
         friendsList.setAll(filteredFriendships);
     }
 
+    /**
+     * Add a delete button to the table view.
+     * The button is added to the last column of the table view.
+     */
     private void addDeleteButtonToTable() {
         deleteColumn.setCellFactory(param -> new TableCell<Friendship, Void>() {
             private final Button deleteButton = new Button("Delete");
@@ -125,6 +148,10 @@ public class FriendsController implements Observer<FriendshipEvent> {
         });
     }
 
+    /**
+     * Update the friendships when a friendship event is received.
+     * @param friendshipEvent the friendship event to be handled
+     */
     @Override
     public void update(FriendshipEvent friendshipEvent) {
         if (friendshipEvent.getType() == EventEnum.RELOAD) {

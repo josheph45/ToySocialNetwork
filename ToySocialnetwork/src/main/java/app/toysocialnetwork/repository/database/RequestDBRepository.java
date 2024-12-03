@@ -7,21 +7,36 @@ import app.toysocialnetwork.repository.AbstractRepository;
 import app.toysocialnetwork.utils.NetworkDB;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class RequestDBRepository implements AbstractRepository<Long, Request> {
     private final Validator<Request> validator;
 
+    /**
+     * Constructor that creates a new RequestDBRepository
+     * @param validator
+     * validator must not be null
+     */
     public RequestDBRepository(Validator<Request> validator) {
         this.validator = validator;
     }
 
+    /**
+     * Establish a connection to the database
+     * @return a connection to the database
+     * @throws SQLException
+     * if the connection cannot be established
+     */
     private Connection connect() throws SQLException {
         return NetworkDB.getInstance().getConnection();
     }
 
+    /**
+     * Find the entity with the given id
+     * @param id -the id of the entity to be returned
+     * id must not be null
+     * @return an {@code Optional} encapsulating the entity with the given id
+     */
     @Override
     public Optional<Request> findOne(Long id) {
         String query = "SELECT * FROM requests WHERE id = ?";
@@ -41,6 +56,10 @@ public class RequestDBRepository implements AbstractRepository<Long, Request> {
         return Optional.empty();
     }
 
+    /**
+     * Find all entities
+     * @return an {@code Iterable} containing all entities
+     */
     @Override
     public Iterable<Request> findAll() {
         List<Request> requests = new ArrayList<>();
@@ -61,6 +80,18 @@ public class RequestDBRepository implements AbstractRepository<Long, Request> {
         return requests;
     }
 
+    /**
+     * Save the entity to the database
+     * @param request
+     * entity must be not null
+     * @return an {@code Optional}
+     * - null if the entity was saved,
+     * - the entity (id already exists)
+     * @throws ValidationException
+     * if the entity is not valid
+     * @throws IllegalArgumentException
+     * if the given entity is null.
+     */
     @Override
     public Optional<Request> save(Request request) throws ValidationException {
         validator.validate(request);
@@ -82,6 +113,14 @@ public class RequestDBRepository implements AbstractRepository<Long, Request> {
         return Optional.empty();
     }
 
+    /**
+     * Remove the entity with the specified id
+     * @param id
+     * id must be not null
+     * @return an {@code Optional}
+     * - null if there is no entity with the given id,
+     * - the removed entity, otherwise
+     */
     @Override
     public Optional<Request> delete(Long id) {
         String query = "DELETE FROM requests WHERE id = ?";
@@ -97,6 +136,18 @@ public class RequestDBRepository implements AbstractRepository<Long, Request> {
         return Optional.empty();
     }
 
+    /**
+     * Update the entity in the database
+     * @param request
+     * entity must not be null
+     * @return an {@code Optional}
+     * - null if the entity was updated
+     * - otherwise (e.g. id does not exist) returns the entity.
+     * @throws IllegalArgumentException
+     * if the given entity is null.
+     * @throws ValidationException
+     * if the entity is not valid.
+     */
     @Override
     public Optional<Request> update(Request request) throws ValidationException {
         validator.validate(request);

@@ -5,17 +5,15 @@ import app.toysocialnetwork.domain.Request;
 public class RequestEvent implements Event {
     private final EventEnum type;
     private final Request newRequest;
-    private Request oldRequest;
 
+    /**
+     * Constructor for RequestEvent
+     * @param type the type of event
+     * @param newRequest the new request
+     */
     public RequestEvent(EventEnum type, Request newRequest) {
         this.type = type;
         this.newRequest = newRequest;
-    }
-
-    public RequestEvent(EventEnum type, Request newRequest, Request oldRequest) {
-        this.type = type;
-        this.newRequest = newRequest;
-        this.oldRequest = oldRequest;
     }
 
     public EventEnum getType() {
@@ -24,9 +22,5 @@ public class RequestEvent implements Event {
 
     public Request getNewRequest() {
         return newRequest;
-    }
-
-    public Request getOldRequest() {
-        return oldRequest;
     }
 }

@@ -7,22 +7,36 @@ import app.toysocialnetwork.repository.AbstractRepository;
 import app.toysocialnetwork.utils.NetworkDB;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class UserDBRepository implements AbstractRepository<Long, User> {
-
     private final Validator<User> validator;
 
+    /**
+     * Constructor that creates a new UserDBRepository
+     * @param validator
+     * validator must not be null
+     */
     public UserDBRepository(Validator<User> validator) {
         this.validator = validator;
     }
 
+    /**
+     * Establish a connection to the database
+     * @return a connection to the database
+     * @throws SQLException
+     * if the connection cannot be established
+     */
     private Connection connect() throws SQLException {
         return NetworkDB.getInstance().getConnection();
     }
 
+    /**
+     * Find the entity with the given id
+     * @param id -the id of the entity to be returned
+     * id must not be null
+     * @return an {@code Optional} encapsulating the entity with the given id
+     */
     @Override
     public Optional<User> findOne(Long id) {
         String query = "SELECT * FROM users WHERE id = ?";
@@ -44,6 +58,10 @@ public class UserDBRepository implements AbstractRepository<Long, User> {
         return Optional.empty();
     }
 
+    /**
+     * Find all entities
+     * @return an {@code Iterable} encapsulating all entities
+     */
     @Override
     public Iterable<User> findAll() {
         List<User> users = new ArrayList<>();
@@ -66,6 +84,15 @@ public class UserDBRepository implements AbstractRepository<Long, User> {
         return users;
     }
 
+    /**
+     * Save the entity to the database
+     * @param user
+     * entity must be not null
+     * @return an {@code Optional} - null if the entity was saved,
+     * - the entity (id already exists)
+     * @throws ValidationException
+     * if the entity is not valid
+     */
     @Override
     public Optional<User> save(User user) throws ValidationException {
         validator.validate(user);
@@ -89,6 +116,14 @@ public class UserDBRepository implements AbstractRepository<Long, User> {
         return Optional.empty();
     }
 
+    /**
+     * Remove the entity with the specified id
+     * @param id
+     * id must be not null
+     * @return an {@code Optional}
+     * - null if there is no entity with the given id,
+     * - the removed entity, otherwise
+     */
     @Override
     public Optional<User> delete(Long id) {
         String query = "DELETE FROM users WHERE id = ?";
@@ -104,6 +139,16 @@ public class UserDBRepository implements AbstractRepository<Long, User> {
         return Optional.empty();
     }
 
+    /**
+     * Update the entity in the database
+     * @param user
+     * entity must not be null
+     * @return an {@code Optional}
+     * - null if the entity was updated
+     * - otherwise (e.g. id does not exist) returns the entity.
+     * @throws ValidationException
+     * if the entity is not valid
+     */
     @Override
     public Optional<User> update(User user) throws ValidationException {
         validator.validate(user);

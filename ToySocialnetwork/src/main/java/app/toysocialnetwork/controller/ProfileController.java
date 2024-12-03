@@ -7,6 +7,7 @@ import app.toysocialnetwork.service.Service;
 import app.toysocialnetwork.utils.event.EventEnum;
 import app.toysocialnetwork.utils.event.FriendshipEvent;
 import app.toysocialnetwork.utils.observer.Observer;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -19,7 +20,6 @@ public class ProfileController implements Observer<FriendshipEvent> {
     private User viewedUser;
     private final ObservableList<User> friendsList = FXCollections.observableArrayList();
 
-    // User detail labels
     @FXML
     private Label usernameLabel;
 
@@ -29,7 +29,6 @@ public class ProfileController implements Observer<FriendshipEvent> {
     @FXML
     private Label lastNameLabel;
 
-    // Friends TableView and Columns
     @FXML
     private TableView<User> friendsTableView;
 
@@ -45,10 +44,14 @@ public class ProfileController implements Observer<FriendshipEvent> {
     @FXML
     private TableColumn<User, Void> viewProfileColumn;
 
-    // Action button (send/reject request or delete friend)
     @FXML
     private Button actionButton;
 
+    /**
+     * Set the service and the user to be viewed.
+     * @param service the service
+     * @param viewedUser the user to be viewed
+     */
     public void setService(Service service, User viewedUser) {
         this.service = service;
         this.viewedUser = viewedUser;
@@ -60,10 +63,17 @@ public class ProfileController implements Observer<FriendshipEvent> {
         configureActionButton();
     }
 
+    /**
+     * Set the action to be performed when the view profile button is clicked.
+     * @param onViewProfile the action to be performed
+     */
     public void setOnViewProfile(Runnable onViewProfile) {
         this.onViewProfile = onViewProfile;
     }
 
+    /**
+     * Handle the back button click event.
+     */
     @FXML
     public void initialize() {
         usernameColumn.setCellValueFactory(new PropertyValueFactory<>("username"));
@@ -73,12 +83,18 @@ public class ProfileController implements Observer<FriendshipEvent> {
         addViewProfileButtonToTable();
     }
 
+    /**
+     * Handle the back button click event.
+     */
     private void loadProfileDetails() {
         usernameLabel.setText("Username: " + viewedUser.getUsername());
         firstNameLabel.setText("First Name: " + viewedUser.getFirstName());
         lastNameLabel.setText("Last Name: " + viewedUser.getLastName());
     }
 
+    /**
+     * Load the friends of the user.
+     */
     private void loadFriends() {
         friendsList.clear();
         Iterable<Friendship> friendships = service.getFriendshipsOfUser(viewedUser.getId());
@@ -92,6 +108,9 @@ public class ProfileController implements Observer<FriendshipEvent> {
         friendsTableView.setItems(friendsList);
     }
 
+    /**
+     * Configure the action button based on the relationship between the current user and the viewed user.
+     */
     private void configureActionButton() {
         Long currentUserId = service.getCurrentUserId();
         Long viewedUserId = viewedUser.getId();
@@ -174,7 +193,9 @@ public class ProfileController implements Observer<FriendshipEvent> {
         }
     }
 
-
+    /**
+     * Add a view profile button to the friends table.
+     */
     private void addViewProfileButtonToTable() {
         viewProfileColumn.setCellFactory(param -> new TableCell<>() {
             private final Button viewButton = new Button("View");
@@ -199,9 +220,12 @@ public class ProfileController implements Observer<FriendshipEvent> {
         });
     }
 
+    /**
+     * Update the friends list if a friendship event occurs.
+     * @param friendshipEvent the friendship event
+     */
     @Override
     public void update(FriendshipEvent friendshipEvent) {
-        // Reload the friends list if a friendship event occurs
         if (friendshipEvent.getType() == EventEnum.RELOAD) {
             loadFriends();
         }

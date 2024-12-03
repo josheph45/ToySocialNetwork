@@ -6,6 +6,7 @@ import app.toysocialnetwork.service.Service;
 import app.toysocialnetwork.utils.event.EventEnum;
 import app.toysocialnetwork.utils.event.RequestEvent;
 import app.toysocialnetwork.utils.observer.Observer;
+
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -19,11 +20,9 @@ public class PendingsController implements Observer<RequestEvent> {
     private Service service;
     private final ObservableList<Request> pendingsList = FXCollections.observableArrayList();
 
-    // The table view to display the requests
     @FXML
     private TableView<Request> pendingsTableView;
 
-    // The columns in the table view
     @FXML
     private TableColumn<Request, String> receiverUsernameColumn;
 
@@ -33,16 +32,28 @@ public class PendingsController implements Observer<RequestEvent> {
     @FXML
     private TableColumn<Request, Void> deleteColumn;
 
+    /**
+     * Set the service for the controller.
+     * @param service the service to be set
+     */
     public void setService(Service service) {
         this.service = service;
         this.service.addRequestObserver(this);
         loadPendings();
     }
 
+    /**
+     * Set the onViewProfile runnable.
+     * @param onViewProfile the runnable to be set
+     */
     public void setOnViewProfile(Runnable onViewProfile) {
         this.onViewProfile = onViewProfile;
     }
 
+    /**
+     * Initialize the controller.
+     * Add view profile and delete buttons to the table.
+     */
     @FXML
     public void initialize() {
         receiverUsernameColumn.setCellValueFactory(cellData -> {
@@ -60,17 +71,27 @@ public class PendingsController implements Observer<RequestEvent> {
         addDeleteButtonToTable();
     }
 
+    /**
+     * Load the pending requests.
+     */
     private void loadPendings() {
         Iterable<Request> requests = service.getRequestsToUser(service.getCurrentUserId());
         pendingsList.setAll((List<Request>) requests);
         pendingsTableView.setItems(pendingsList);
     }
 
+    /**
+     * Handle the delete request action.
+     * @param request the request to be deleted
+     */
     private void handleDeleteRequest(Request request) {
         service.deleteRequest(request.getId());
         loadPendings();
     }
 
+    /**
+     * Add view profile button to the table.
+     */
     @FXML
     private void addViewProfileButtonToTable() {
         viewProfileColumn.setCellFactory(param -> new TableCell<Request, Void>() {
@@ -104,6 +125,9 @@ public class PendingsController implements Observer<RequestEvent> {
         });
     }
 
+    /**
+     * Add delete button to the table.
+     */
     private void addDeleteButtonToTable() {
         deleteColumn.setCellFactory(param -> new TableCell<>() {
             private final Button deleteButton = new Button("Delete");
@@ -126,6 +150,10 @@ public class PendingsController implements Observer<RequestEvent> {
         });
     }
 
+    /**
+     * Update the controller.
+     * @param event the event to be handled
+     */
     @Override
     public void update(RequestEvent event) {
         if (event.getType() == EventEnum.DELETE) {

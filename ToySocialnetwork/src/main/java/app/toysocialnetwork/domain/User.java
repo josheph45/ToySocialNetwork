@@ -1,7 +1,5 @@
 package app.toysocialnetwork.domain;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 public class User extends Entity<Long> {
@@ -9,9 +7,6 @@ public class User extends Entity<Long> {
     private String lastName;
     private String username;
     private String password;
-
-    private final List<User> friends = new ArrayList<>();
-    private final List<Request> friendRequests = new ArrayList<>();
 
     public User(String firstName, String lastName, String username, String password) {
         this.firstName = firstName;
@@ -50,26 +45,6 @@ public class User extends Entity<Long> {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public List<User> getFriends() {
-        return friends;
-    }
-
-    public void addFriend(User user) {
-        friends.add(user);
-    }
-
-    public List<Request> getFriendRequests() {
-        return friendRequests;
-    }
-
-    public void addFriendRequest(Request request) {
-        friendRequests.add(request);
-    }
-
-    public void removeFriendRequest(Request request) {
-        friendRequests.remove(request);
     }
 
     @Override

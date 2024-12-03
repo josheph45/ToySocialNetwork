@@ -4,10 +4,7 @@ import app.toysocialnetwork.domain.User;
 import app.toysocialnetwork.service.Service;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 
 import java.util.Optional;
 
@@ -29,10 +26,17 @@ public class RegisterController {
     @FXML
     private Button registerButton;
 
+    /**
+     * Set the service for the controller
+     * @param service the service to be set
+     */
     public void setService(Service service) {
         this.service = service; // Inject the Service
     }
 
+    /**
+     * Initialize the controller
+     */
     @FXML
     public void handleRegister() {
         String firstName = firstNameField.getText();
@@ -61,6 +65,12 @@ public class RegisterController {
         }
     }
 
+    /**
+     * Show an alert
+     * @param title the title of the alert
+     * @param message the message of the alert
+     * @param type the type of the alert
+     */
     private void showAlert(String title, String message, Alert.AlertType type) {
         Alert alert = new Alert(type);
         alert.setTitle(title);
@@ -68,6 +78,9 @@ public class RegisterController {
         alert.show();
     }
 
+    /**
+     * Clear the fields
+     */
     private void clearFields() {
         firstNameField.clear();
         lastNameField.clear();

@@ -2,15 +2,10 @@ package app.toysocialnetwork.controller;
 
 import app.toysocialnetwork.domain.User;
 import app.toysocialnetwork.service.Service;
-import app.toysocialnetwork.utils.event.EventEnum;
+import app.toysocialnetwork.utils.event.*;
 
-import app.toysocialnetwork.utils.event.FriendshipEvent;
-import app.toysocialnetwork.utils.event.RequestEvent;
-import app.toysocialnetwork.utils.event.UserEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 
 import java.util.Optional;
 
@@ -27,14 +22,27 @@ public class LoginController {
     @FXML
     private Button loginButton;
 
+    /**
+     * Set the service for the controller
+     * @param service the service to be set
+     */
     public void setService(Service service) {
         this.service = service;
     }
 
+    /**
+     * Set the onLogin runnable
+     * @param onLogin the runnable to be set
+     */
     public void setOnLogin(Runnable onLogin) {
         this.onLogin = onLogin;
     }
 
+    /**
+     * Initialize the controller
+     * Add a listener to the login button
+     */
+    @FXML
     public void handleLogin() {
         String username = usernameField.getText();
         String password = passwordField.getText();
@@ -67,6 +75,12 @@ public class LoginController {
         }
     }
 
+    /**
+     * Show an alert with the given title, content and type
+     * @param title the title of the alert
+     * @param content the content of the alert
+     * @param type the type of the alert
+     */
     private void showAlert(String title, String content, Alert.AlertType type) {
         Alert alert = new Alert(type);
         alert.setTitle(title);

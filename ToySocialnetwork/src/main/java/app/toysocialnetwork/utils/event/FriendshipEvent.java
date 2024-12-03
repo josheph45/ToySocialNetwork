@@ -5,17 +5,15 @@ import app.toysocialnetwork.domain.Friendship;
 public class FriendshipEvent implements Event {
     private final EventEnum type;
     private final Friendship newFriendship;
-    private Friendship oldFriendship;
 
+    /**
+     * Constructor for FriendshipEvent
+     * @param type the type of event
+     * @param newFriendship the new friendship
+     */
     public FriendshipEvent(EventEnum type, Friendship newFriendship) {
         this.type = type;
         this.newFriendship = newFriendship;
-    }
-
-    public FriendshipEvent(EventEnum type, Friendship newFriendship, Friendship oldFriendship) {
-        this.type = type;
-        this.newFriendship = newFriendship;
-        this.oldFriendship = oldFriendship;
     }
 
     public EventEnum getType() {
@@ -24,9 +22,5 @@ public class FriendshipEvent implements Event {
 
     public Friendship getNewFriendship() {
         return newFriendship;
-    }
-
-    public Friendship getOldFriendship() {
-        return oldFriendship;
     }
 }

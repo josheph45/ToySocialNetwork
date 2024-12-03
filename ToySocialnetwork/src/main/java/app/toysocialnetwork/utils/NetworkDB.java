@@ -3,6 +3,9 @@ package app.toysocialnetwork.utils;
 public class NetworkDB extends DataBase {
     private final static NetworkDB instance = new NetworkDB();
 
+    /**
+     * Constructor for NetworkDB
+     */
     private NetworkDB() {
         super(
                 Config.getProperty("db.url"),
@@ -10,6 +13,10 @@ public class NetworkDB extends DataBase {
                 Config.getProperty("db.password"));
     }
 
+    /**
+     * Get the instance of NetworkDB
+     * @return the instance of NetworkDB
+     */
     public static NetworkDB getInstance() {
         return instance;
     }

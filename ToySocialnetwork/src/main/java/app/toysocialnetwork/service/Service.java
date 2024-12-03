@@ -33,6 +33,15 @@ public class Service implements UserObservable, FriendshipObservable, RequestObs
     private Long friendshipIdCounter = 1L;
     private Long requestIdCounter = 1L;
 
+    /**
+     * Constructor that creates a new Service
+     * @param repositoryUser - the repository for users
+     * repositoryUser must not be null
+     * @param repositoryFriendship - the repository for friendships
+     * repositoryFriendship must not be null
+     * @param repositoryRequest - the repository for requests
+     * repositoryRequest must not be null
+     */
     public Service(UserDBRepository repositoryUser, FriendshipDBRepository repositoryFriendship, RequestDBRepository repositoryRequest) {
         this.userRepo = repositoryUser;
         this.friendshipRepo = repositoryFriendship;
@@ -45,24 +54,45 @@ public class Service implements UserObservable, FriendshipObservable, RequestObs
         initializeCounters();
     }
 
+    /**
+     * Initialize the counters for the ids of the entities
+     */
     private void initializeCounters() {
         userRepo.findAll().forEach(user -> userIdCounter = Math.max(userIdCounter, user.getId() + 1));
         friendshipRepo.findAll().forEach(friendship -> friendshipIdCounter = Math.max(friendshipIdCounter, friendship.getId() + 1));
         requestRepo.findAll().forEach(request -> requestIdCounter = Math.max(requestIdCounter, request.getId() + 1));
     }
 
+    /**
+     * Get the current user id
+     * currentUserId must not be null
+     */
     public Long getCurrentUserId() {
         return currentUserId;
     }
 
+    /**
+     * Get the current user id
+     * @param currentUserId - the id of the current user
+     * currentUserId must not be null
+     */
     public void setCurrentUserId(Long currentUserId) {
         this.currentUserId = currentUserId;
     }
 
+    /**
+     * Get the selected user id
+     * selectedUserId must not be null
+     */
     public Long getSelectedUserId() {
         return selectedUserId;
     }
 
+    /**
+     * Set the selected user id
+     * @param selectedUserId - the id of the selected user
+     * selectedUserId must not be null
+     */
     public void setSelectedUserId(Long selectedUserId) {
         this.selectedUserId = selectedUserId;
     }
@@ -72,14 +102,31 @@ public class Service implements UserObservable, FriendshipObservable, RequestObs
 
 
     // User-related methods
+
+    /**
+     * Get all users
+     * @return an {@code Iterable} encapsulating all users
+     */
     public Iterable<User> getUsers() {
         return userRepo.findAll();
     }
 
+    /**
+     * Get the user with the given id
+     * @param userId - the id of the user to be returned
+     * userId must not be null
+     * @return an {@code Optional} encapsulating the user with the given id
+     */
     public Optional<User> getUserById(Long userId) {
         return userRepo.findOne(userId);
     }
 
+    /**
+     * Add a user
+     * @param user - the user to be added
+     * user must not be null
+     * @return an {@code Optional} encapsulating the added user
+     */
     public Optional<User> addUser(User user) {
         user.setId(userIdCounter++);
         Optional<User> savedUser = userRepo.save(user);
@@ -87,12 +134,24 @@ public class Service implements UserObservable, FriendshipObservable, RequestObs
         return savedUser;
     }
 
+    /**
+     * Update a user
+     * @param user - the user to be updated
+     * user must not be null
+     * @return an {@code Optional} encapsulating the updated user
+     */
     public Optional<User> updateUser(User user) {
         Optional<User> updatedUser = userRepo.update(user);
         updatedUser.ifPresent(u -> notifyUserObservers(new UserEvent(EventEnum.UPDATE, u)));
         return updatedUser;
     }
 
+    /**
+     * Delete a user
+     * @param userId - the id of the user to be deleted
+     * userId must not be null
+     * @return an {@code Optional} encapsulating the deleted user
+     */
     public Optional<User> deleteUser(Long userId) {
         deleteFriendshipsOfUser(userId);
         deleteRequestsOfUser(userId);
@@ -101,6 +160,12 @@ public class Service implements UserObservable, FriendshipObservable, RequestObs
         return deletedUser;
     }
 
+    /**
+     * Find the user with the given username
+     * @param username - the username of the user to be returned
+     * username must not be null
+     * @return an {@code Optional} encapsulating the user with the given username
+     */
     public Optional<User> findUserByUsername(String username) {
         for (User user : getUsers()) {
             if (user.getUsername().equals(username)) {
@@ -115,10 +180,21 @@ public class Service implements UserObservable, FriendshipObservable, RequestObs
 
 
     // Friendship-related methods
+
+    /**
+     * Get all friendships
+     * @return an {@code Iterable} encapsulating all friendships
+     */
     public Iterable<Friendship> getFriendships() {
         return friendshipRepo.findAll();
     }
 
+    /**
+     * Get all friendships of a user
+     * @param userId - the id of the user whose friendships are to be returned
+     * userId must not be null
+     * @return an {@code Iterable} encapsulating all friendships of the user
+     */
     public Iterable<Friendship> getFriendshipsOfUser(Long userId) {
         List<Friendship> friendships = new ArrayList<>();
         for (Friendship friendship : getFriendships()) {
@@ -129,6 +205,14 @@ public class Service implements UserObservable, FriendshipObservable, RequestObs
         return friendships;
     }
 
+    /**
+     * Add a friendship
+     * @param userId1 - the id of the first user
+     * userId1 must not be null
+     * @param userId2 - the id of the second user
+     * userId2 must not be null
+     * @return an {@code Optional} encapsulating the added friendship
+     */
     public Optional<Friendship> addFriendship(Long userId1, Long userId2) {
         boolean friendshipExists = false;
         for (Friendship friendship : getFriendships()) {
@@ -150,12 +234,23 @@ public class Service implements UserObservable, FriendshipObservable, RequestObs
         return savedFriendship;
     }
 
+    /**
+     * Update a friendship
+     * @param friendshipId - the id of the friendship to be updated
+     * friendshipId must not be null
+     * @return an {@code Optional} encapsulating the updated friendship
+     */
     public Optional<Friendship> deleteFriendship(Long friendshipId) {
         Optional<Friendship> deletedFriendship = friendshipRepo.delete(friendshipId);
         deletedFriendship.ifPresent(f -> notifyFriendshipObservers(new FriendshipEvent(EventEnum.DELETE, f)));
         return deletedFriendship;
     }
 
+    /**
+     * Delete all friendships of a user
+     * @param userId - the id of the user whose friendships are to be deleted
+     * userId must not be null
+     */
     public void deleteFriendshipsOfUser(Long userId) {
         getFriendships().forEach(friendship -> {
             if (friendship.getUser1Id().equals(userId) || friendship.getUser2Id().equals(userId)) {
@@ -169,10 +264,21 @@ public class Service implements UserObservable, FriendshipObservable, RequestObs
 
 
     // Request-related methods
+
+    /**
+     * Get all requests
+     * @return an {@code Iterable} encapsulating all requests
+     */
     public Iterable<Request> getRequests() {
         return requestRepo.findAll();
     }
 
+    /**
+     * Get all requests received by a user
+     * @param receiverId - the id of the user who received the requests
+     * receiverId must not be null
+     * @return an {@code Iterable} encapsulating all requests received by the user
+     */
     public Iterable<Request> getRequestsByReceiver(Long receiverId) {
         List<Request> requests = new ArrayList<>();
         for (Request request : getRequests()) {
@@ -183,6 +289,12 @@ public class Service implements UserObservable, FriendshipObservable, RequestObs
         return requests;
     }
 
+    /**
+     * Get all requests sent by a user
+     * @param userId - the id of the user who sent the requests
+     * userId must not be null
+     * @return an {@code Iterable} encapsulating all requests sent by the user
+     */
     public Iterable<Request> getRequestsToUser(Long userId) {
         List<Request> requests = new ArrayList<>();
         for (Request request : getRequests()) {
@@ -193,6 +305,14 @@ public class Service implements UserObservable, FriendshipObservable, RequestObs
         return requests;
     }
 
+    /**
+     * Add a request
+     * @param senderId - the id of the user who sent the request
+     * senderId must not be null
+     * @param receiverId - the id of the user who received the request
+     * receiverId must not be null
+     * @return an {@code Optional} encapsulating the added request
+     */
     public Optional<Request> addRequest(Long senderId, Long receiverId) {
         boolean friendshipExists = false;
         for (Friendship friendship : getFriendships()) {
@@ -241,18 +361,35 @@ public class Service implements UserObservable, FriendshipObservable, RequestObs
         return savedRequest;
     }
 
+    /**
+     * Update a request
+     * @param request - the request to be updated
+     * request must not be null
+     * @return an {@code Optional} encapsulating the updated request
+     */
     public Optional<Request> updateRequest(Request request) {
         Optional<Request> updatedRequest = requestRepo.update(request);
         updatedRequest.ifPresent(r -> notifyRequestObservers(new RequestEvent(EventEnum.UPDATE, r)));
         return updatedRequest;
     }
 
+    /**
+     * Delete a request
+     * @param requestId - the id of the request to be deleted
+     * requestId must not be null
+     * @return an {@code Optional} encapsulating the deleted request
+     */
     public Optional<Request> deleteRequest(Long requestId) {
         Optional<Request> deletedRequest = requestRepo.delete(requestId);
         deletedRequest.ifPresent(r -> notifyRequestObservers(new RequestEvent(EventEnum.DELETE, r)));
         return deletedRequest;
     }
 
+    /**
+     * Delete all requests of a user
+     * @param userId - the id of the user whose requests are to be deleted
+     * userId must not be null
+     */
     public void deleteRequestsOfUser(Long userId) {
         getRequests().forEach(request -> {
             if (request.getSenderId().equals(userId) || request.getReceiverId().equals(userId)) {
@@ -262,48 +399,96 @@ public class Service implements UserObservable, FriendshipObservable, RequestObs
     }
 
     // Observer-related methods for users
+
+    /**
+     * Add an observer for users
+     * @param observer - the observer to be added
+     * observer must not be null
+     */
     @Override
     public void addUserObserver(Observer<UserEvent> observer) {
         userObserver.add(observer);
     }
 
+    /**
+     * Remove an observer for users
+     * @param observer - the observer to be removed
+     * observer must not be null
+     */
     @Override
     public void removeUserObserver(Observer<UserEvent> observer) {
         userObserver.remove(observer);
     }
 
+    /**
+     * Notify all user observers
+     * @param event - the event to be sent to the observers
+     * event must not be null
+     */
     @Override
     public void notifyUserObservers(UserEvent event) {
         userObserver.forEach(observer -> observer.update(event));
     }
 
     // Observer-related methods for friendships
+
+    /**
+     * Add an observer for friendships
+     * @param observer - the observer to be added
+     * observer must not be null
+     */
     @Override
     public void addFriendshipObserver(Observer<FriendshipEvent> observer) {
         friendshipObserver.add(observer);
     }
 
+    /**
+     * Remove an observer for friendships
+     * @param observer - the observer to be removed
+     * observer must not be null
+     */
     @Override
     public void removeFriendshipObserver(Observer<FriendshipEvent> observer) {
         friendshipObserver.remove(observer);
     }
 
+    /**
+     * Notify all friendship observers
+     * @param event - the event to be sent to the observers
+     * event must not be null
+     */
     @Override
     public void notifyFriendshipObservers(FriendshipEvent event) {
         friendshipObserver.forEach(observer -> observer.update(event));
     }
 
     // Observer-related methods for requests
+
+    /**
+     * Add an observer for requests
+     * @param observer - the observer to be added
+     * observer must not be null
+     */
     @Override
     public void addRequestObserver(Observer<RequestEvent> observer) {
         requestObserver.add(observer);
     }
 
+    /**
+     * Remove an observer for requests
+     * @param observer - the observer to be removed
+     * observer must not be null
+     */
     @Override
     public void removeRequestObserver(Observer<RequestEvent> observer) {
         requestObserver.remove(observer);
     }
 
+    /**
+     * Notify all request observers
+     * @param event - the event to be sent to the observers
+     * event must not be null
+     */
     @Override
     public void notifyRequestObservers(RequestEvent event) {
         requestObserver.forEach(observer -> observer.update(event));
