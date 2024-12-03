@@ -18,7 +18,7 @@
                         <TableColumn fx:id="receiverUsernameColumn" prefWidth="120.0" text="Receiver Username" />
 
                         <!-- Action Buttons -->
-                        <TableColumn fx:id="viewProfileColumn" prefWidth="60.0" text="View Profile" />
+                        <TableColumn fx:id="viewColumn" prefWidth="60.0" text="View" />
                         <TableColumn fx:id="deleteColumn" prefWidth="100.0" text="Cancel" />
                     </columns>
                 </TableView>

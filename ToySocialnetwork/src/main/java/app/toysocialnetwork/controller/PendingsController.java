@@ -27,7 +27,7 @@ public class PendingsController implements Observer<RequestEvent> {
     private TableColumn<Request, String> receiverUsernameColumn;
 
     @FXML
-    private TableColumn<Request, Void> viewProfileColumn;
+    private TableColumn<Request, Void> viewColumn;
 
     @FXML
     private TableColumn<Request, Void> deleteColumn;
@@ -98,7 +98,7 @@ public class PendingsController implements Observer<RequestEvent> {
      */
     @FXML
     private void addViewProfileButtonToTable() {
-        viewProfileColumn.setCellFactory(param -> new TableCell<Request, Void>() {
+        viewColumn.setCellFactory(param -> new TableCell<Request, Void>() {
             private final Button viewButton = new Button("View");
             {
                 viewButton.setOnAction(event -> {

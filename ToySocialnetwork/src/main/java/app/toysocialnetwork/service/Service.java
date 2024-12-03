@@ -17,6 +17,8 @@ import app.toysocialnetwork.utils.observer.UserObservable;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 public class Service implements UserObservable, FriendshipObservable, RequestObservable {
     private final UserDBRepository userRepo;
@@ -167,12 +169,9 @@ public class Service implements UserObservable, FriendshipObservable, RequestObs
      * @return an {@code Optional} encapsulating the user with the given username
      */
     public Optional<User> findUserByUsername(String username) {
-        for (User user : getUsers()) {
-            if (user.getUsername().equals(username)) {
-                return Optional.of(user);
-            }
-        }
-        return Optional.empty();
+        return StreamSupport.stream(getUsers().spliterator(), false)
+                .filter(user -> user.getUsername().equals(username))
+                .findFirst();
     }
 
 
@@ -196,13 +195,9 @@ public class Service implements UserObservable, FriendshipObservable, RequestObs
      * @return an {@code Iterable} encapsulating all friendships of the user
      */
     public Iterable<Friendship> getFriendshipsOfUser(Long userId) {
-        List<Friendship> friendships = new ArrayList<>();
-        for (Friendship friendship : getFriendships()) {
-            if (friendship.getUser1Id().equals(userId) || friendship.getUser2Id().equals(userId)) {
-                friendships.add(friendship);
-            }
-        }
-        return friendships;
+        return StreamSupport.stream(getFriendships().spliterator(), false)
+                .filter(friendship -> friendship.getUser1Id().equals(userId) || friendship.getUser2Id().equals(userId))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -214,14 +209,9 @@ public class Service implements UserObservable, FriendshipObservable, RequestObs
      * @return an {@code Optional} encapsulating the added friendship
      */
     public Optional<Friendship> addFriendship(Long userId1, Long userId2) {
-        boolean friendshipExists = false;
-        for (Friendship friendship : getFriendships()) {
-            if ((friendship.getUser1Id().equals(userId1) && friendship.getUser2Id().equals(userId2)) ||
-                    (friendship.getUser1Id().equals(userId2) && friendship.getUser2Id().equals(userId1))) {
-                friendshipExists = true;
-                break;
-            }
-        }
+        boolean friendshipExists = StreamSupport.stream(getFriendships().spliterator(), false)
+                .anyMatch(friendship -> (friendship.getUser1Id().equals(userId1) && friendship.getUser2Id().equals(userId2)) ||
+                        (friendship.getUser1Id().equals(userId2) && friendship.getUser2Id().equals(userId1)));
 
         if (friendshipExists) {
             throw new IllegalStateException("A friendship already exists between these users.");
@@ -230,7 +220,9 @@ public class Service implements UserObservable, FriendshipObservable, RequestObs
         Friendship friendship = new Friendship(userId1, userId2, LocalDateTime.now());
         friendship.setId(friendshipIdCounter++);
         Optional<Friendship> savedFriendship = friendshipRepo.save(friendship);
+
         savedFriendship.ifPresent(f -> notifyFriendshipObservers(new FriendshipEvent(EventEnum.ADD, f)));
+
         return savedFriendship;
     }
 
@@ -280,13 +272,9 @@ public class Service implements UserObservable, FriendshipObservable, RequestObs
      * @return an {@code Iterable} encapsulating all requests received by the user
      */
     public Iterable<Request> getRequestsByReceiver(Long receiverId) {
-        List<Request> requests = new ArrayList<>();
-        for (Request request : getRequests()) {
-            if (request.getReceiverId().equals(receiverId)) {
-                requests.add(request);
-            }
-        }
-        return requests;
+        return StreamSupport.stream(getRequests().spliterator(), false)
+                .filter(request -> request.getReceiverId().equals(receiverId))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -296,13 +284,9 @@ public class Service implements UserObservable, FriendshipObservable, RequestObs
      * @return an {@code Iterable} encapsulating all requests sent by the user
      */
     public Iterable<Request> getRequestsToUser(Long userId) {
-        List<Request> requests = new ArrayList<>();
-        for (Request request : getRequests()) {
-            if (request.getSenderId().equals(userId)) {
-                requests.add(request);
-            }
-        }
-        return requests;
+        return StreamSupport.stream(getRequests().spliterator(), false)
+                .filter(request -> request.getSenderId().equals(userId))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -314,38 +298,24 @@ public class Service implements UserObservable, FriendshipObservable, RequestObs
      * @return an {@code Optional} encapsulating the added request
      */
     public Optional<Request> addRequest(Long senderId, Long receiverId) {
-        boolean friendshipExists = false;
-        for (Friendship friendship : getFriendships()) {
-            if ((friendship.getUser1Id().equals(senderId) && friendship.getUser2Id().equals(receiverId)) ||
-                    (friendship.getUser1Id().equals(receiverId) && friendship.getUser2Id().equals(senderId))) {
-                friendshipExists = true;
-                break;
-            }
-        }
+        boolean friendshipExists = StreamSupport.stream(getFriendships().spliterator(), false)
+                .anyMatch(friendship -> (friendship.getUser1Id().equals(senderId) && friendship.getUser2Id().equals(receiverId)) ||
+                        (friendship.getUser1Id().equals(receiverId) && friendship.getUser2Id().equals(senderId)));
 
         if (friendshipExists) {
             throw new IllegalStateException("A friendship already exists between these users.");
         }
 
-        boolean requestExists = false;
-        for (Request request : getRequests()) {
-            if (request.getSenderId().equals(senderId) && request.getReceiverId().equals(receiverId)) {
-                requestExists = true;
-                break;
-            }
-        }
+        boolean requestExists = StreamSupport.stream(getRequests().spliterator(), false)
+                .anyMatch(request -> request.getSenderId().equals(senderId) && request.getReceiverId().equals(receiverId));
 
         if (requestExists) {
             throw new IllegalStateException("A request already exists from user " + senderId + " to user " + receiverId);
         }
 
-        Optional<Request> reciprocalRequest = Optional.empty();
-        for (Request request : getRequests()) {
-            if (request.getSenderId().equals(receiverId) && request.getReceiverId().equals(senderId)) {
-                reciprocalRequest = Optional.of(request);
-                break;
-            }
-        }
+        Optional<Request> reciprocalRequest = StreamSupport.stream(getRequests().spliterator(), false)
+                .filter(request -> request.getSenderId().equals(receiverId) && request.getReceiverId().equals(senderId))
+                .findFirst();
 
         if (reciprocalRequest.isPresent()) {
             addFriendship(senderId, receiverId);

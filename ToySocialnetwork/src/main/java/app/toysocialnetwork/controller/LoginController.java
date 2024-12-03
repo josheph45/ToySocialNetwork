@@ -1,5 +1,6 @@
 package app.toysocialnetwork.controller;
 
+import app.toysocialnetwork.domain.Request;
 import app.toysocialnetwork.domain.User;
 import app.toysocialnetwork.service.Service;
 import app.toysocialnetwork.utils.event.*;
@@ -8,6 +9,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class LoginController {
     private Runnable onLogin;
@@ -67,11 +69,34 @@ public class LoginController {
                     onLogin.run();
                 }
 
+                showFriendRequestNotification();
+
             } else {
                 showAlert("Login Failed", "Incorrect password!", Alert.AlertType.ERROR);
             }
         } else {
             showAlert("Login Failed", "User not found!", Alert.AlertType.ERROR);
+        }
+    }
+
+    private void showFriendRequestNotification() {
+        Long currentUserId = service.getCurrentUserId();
+        Iterable<Request> requests = service.getRequestsByReceiver(currentUserId);
+
+        if (requests != null) {
+            StringBuilder messageBuilder = new StringBuilder("You have friend requests from:\n");
+
+            AtomicBoolean hasRequests = new AtomicBoolean(false);
+            for (Request request : requests) {
+                service.getUserById(request.getSenderId()).ifPresent(sender -> {
+                    hasRequests.set(true);
+                    messageBuilder.append("- ").append(sender.getUsername()).append("\n");
+                });
+            }
+
+            if (hasRequests.get()) {
+                showAlert("Friend Requests", messageBuilder.toString(), Alert.AlertType.INFORMATION);
+            }
         }
     }
 
