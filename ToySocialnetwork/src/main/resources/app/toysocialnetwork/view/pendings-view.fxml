@@ -17,11 +17,14 @@
                         <!-- Recipient Username Column -->
                         <TableColumn fx:id="receiverUsernameColumn" prefWidth="120.0" text="Receiver Username" />
 
-                        <!-- Cancel Button Column -->
-                        <TableColumn fx:id="viewProfileColumn" prefWidth="60.0" text="Action" />
-                  <TableColumn fx:id="deleteColumn" prefWidth="100.0" text="Action" />
+                        <!-- Action Buttons -->
+                        <TableColumn fx:id="viewProfileColumn" prefWidth="60.0" text="View Profile" />
+                        <TableColumn fx:id="deleteColumn" prefWidth="100.0" text="Cancel" />
                     </columns>
                 </TableView>
+
+                <!-- Refresh Button -->
+                <Button fx:id="refreshButton" text="Refresh" style="-fx-font-size: 14px; -fx-padding: 5;" />
             </children>
             <padding>
                 <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />

@@ -35,6 +35,9 @@ public class RequestsController implements Observer<RequestEvent> {
     @FXML
     private TableColumn<Request, Void> rejectColumn;
 
+    @FXML
+    private Button refreshButton;
+
     /**
      * Sets the service and adds the controller as an observer for request events.
      * Loads the requests from the service.
@@ -73,6 +76,7 @@ public class RequestsController implements Observer<RequestEvent> {
         addViewProfileButtonToTable();
         addAcceptButtonToTable();
         addRejectButtonToTable();
+        refreshButton.setOnAction(event -> loadRequests());
     }
 
     /**

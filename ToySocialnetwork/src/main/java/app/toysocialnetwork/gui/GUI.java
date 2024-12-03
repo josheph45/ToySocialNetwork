@@ -134,6 +134,18 @@ public class GUI extends Application {
         mainController.setOnLogOut(() -> {
             openLoginWindow((Stage) mainView.getScene().getWindow(), service);
         });
+        mainController.setOnUsers(() -> {
+            openUsersWindow((Stage) mainView.getScene().getWindow(), service);
+        });
+        mainController.setOnFriends(() -> {
+            openFriendsWindow((Stage) mainView.getScene().getWindow(), service);
+        });
+        mainController.setOnRequests(() -> {
+            openRequestsWindow((Stage) mainView.getScene().getWindow(), service);
+        });
+        mainController.setOnPendings(() -> {
+            openPendingsWindow((Stage) mainView.getScene().getWindow(), service);
+        });
 
         return mainView;
     }
@@ -154,6 +166,78 @@ public class GUI extends Application {
         });
 
         return profileView;
+    }
+
+    private void openUsersWindow(Stage stage, Service service) {
+        try {
+            // add the users view to the stage, to the already existing tabs
+            AnchorPane usersView = loadUsersView(service);
+            Tab usersTab = new Tab("Users");
+            usersTab.setContent(usersView);
+            usersTab.setClosable(true);
+
+            TabPane tabPane = (TabPane) stage.getScene().getRoot();
+            tabPane.getTabs().add(usersTab);
+
+            // select the users tab
+            tabPane.getSelectionModel().select(usersTab);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void openFriendsWindow(Stage stage, Service service) {
+        try {
+            // add the friends view to the stage, to the already existing tabs
+            AnchorPane friendsView = loadFriendsView(service);
+            Tab friendsTab = new Tab("Friends");
+            friendsTab.setContent(friendsView);
+            friendsTab.setClosable(true);
+
+            TabPane tabPane = (TabPane) stage.getScene().getRoot();
+            tabPane.getTabs().add(friendsTab);
+
+            // select the friends tab
+            tabPane.getSelectionModel().select(friendsTab);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void openRequestsWindow(Stage stage, Service service) {
+        try {
+            // add the requests view to the stage, to the already existing tabs
+            AnchorPane requestsView = loadRequestsView(service);
+            Tab requestsTab = new Tab("Requests");
+            requestsTab.setContent(requestsView);
+            requestsTab.setClosable(true);
+
+            TabPane tabPane = (TabPane) stage.getScene().getRoot();
+            tabPane.getTabs().add(requestsTab);
+
+            // select the requests tab
+            tabPane.getSelectionModel().select(requestsTab);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void openPendingsWindow(Stage stage, Service service) {
+        try {
+            // add the pendings view to the stage, to the already existing tabs
+            AnchorPane pendingsView = loadPendingsView(service);
+            Tab pendingsTab = new Tab("Pendings");
+            pendingsTab.setContent(pendingsView);
+            pendingsTab.setClosable(true);
+
+            TabPane tabPane = (TabPane) stage.getScene().getRoot();
+            tabPane.getTabs().add(pendingsTab);
+
+            // select the pendings tab
+            tabPane.getSelectionModel().select(pendingsTab);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void openProfileWindow(Stage stage, Service service) {
@@ -208,42 +292,14 @@ public class GUI extends Application {
             // Load the main view
             AnchorPane mainView = loadMainView(service);
 
-            // Load the users view
-            AnchorPane usersView = loadUsersView(service);
-
-            // Load the friends view
-            AnchorPane friendsView = loadFriendsView(service);
-
-            // Load the requests view
-            AnchorPane requestsView = loadRequestsView(service);
-
-            // Load the pendings view
-            AnchorPane pendingsView = loadPendingsView(service);
-
             // Create tabs
             Tab mainTab = new Tab("Main");
             mainTab.setContent(mainView);
             mainTab.setClosable(false);
 
-            Tab usersTab = new Tab("Users");
-            usersTab.setContent(usersView);
-            usersTab.setClosable(false);
-
-            Tab friendsTab = new Tab("Friends");
-            friendsTab.setContent(friendsView);
-            friendsTab.setClosable(false);
-
-            Tab requestsTab = new Tab("Requests");
-            requestsTab.setContent(requestsView);
-            requestsTab.setClosable(false);
-
-            Tab pendingsTab = new Tab("Pendings");
-            pendingsTab.setContent(pendingsView);
-            pendingsTab.setClosable(false);
-
             // Create the TabPane and add the tabs
             TabPane tabPane = new TabPane();
-            tabPane.getTabs().addAll(mainTab, usersTab, friendsTab, requestsTab, pendingsTab);
+            tabPane.getTabs().addAll(mainTab);
 
             // Create the scene and show the stage
             Scene scene = new Scene(tabPane, 600, 400);

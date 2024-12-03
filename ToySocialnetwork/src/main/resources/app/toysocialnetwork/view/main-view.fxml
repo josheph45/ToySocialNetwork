@@ -6,7 +6,7 @@
 
 <AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.toysocialnetwork.controller.MainController">
     <children>
-        <VBox alignment="CENTER" layoutX="100.0" layoutY="50.0" prefHeight="300.0" prefWidth="400.0" spacing="20.0">
+        <VBox alignment="CENTER" layoutX="100.0" layoutY="25.0" prefHeight="300.0" prefWidth="400.0" spacing="10.0">
             <children>
                 <!-- Welcome Label -->
                 <Label style="-fx-font-size: 24px; -fx-font-weight: bold;" text="Welcome to Toy Social Network" />
@@ -14,11 +14,33 @@
                 <!-- Logged-in User Label -->
                 <Label fx:id="loggedInAsLabel" style="-fx-font-size: 18px;" text="Not logged in" />
 
-                <!-- Buttons -->
-                <VBox spacing="10.0" alignment="CENTER">
+                <!-- GridPane for Users, Friends, Requests, and Pendings -->
+                <GridPane alignment="CENTER" hgap="20" vgap="10">
                     <children>
-                        <Button fx:id="logOutButton" text="Log Out" style="-fx-font-size: 16px; -fx-padding: 10;" />
-                        <Button fx:id="deleteAccountButton" text="Delete Account" style="-fx-font-size: 16px; -fx-padding: 10; -fx-background-color: #ff5555; -fx-text-fill: white;" />
+                        <!-- Users Button -->
+                        <Button fx:id="usersButton" prefHeight="46.0" prefWidth="86.0" style="-fx-font-size: 16px; -fx-padding: 10;" text="Users" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                        <!-- Friends Button -->
+                        <Button fx:id="friendsButton" prefHeight="46.0" prefWidth="86.0" style="-fx-font-size: 16px; -fx-padding: 10;" text="Friends" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                        <!-- Requests Button -->
+                        <Button fx:id="requestsButton" prefHeight="46.0" prefWidth="86.0" style="-fx-font-size: 16px; -fx-padding: 10;" text="Requests" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                        <!-- Pendings Button -->
+                        <Button fx:id="pendingsButton" style="-fx-font-size: 16px; -fx-padding: 10;" text="Pendings" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                    </children>
+               <columnConstraints>
+                  <ColumnConstraints />
+                  <ColumnConstraints />
+               </columnConstraints>
+               <rowConstraints>
+                  <RowConstraints />
+                  <RowConstraints />
+               </rowConstraints>
+                </GridPane>
+
+                <!-- VBox for Log Out and Delete Account Buttons -->
+                <VBox alignment="CENTER" spacing="10.0">
+                    <children>
+                        <Button fx:id="logOutButton" style="-fx-font-size: 16px; -fx-padding: 10;" text="Log Out" />
+                        <Button fx:id="deleteAccountButton" style="-fx-font-size: 16px; -fx-padding: 10; -fx-background-color: #ff5555; -fx-text-fill: white;" text="Delete Account" />
                     </children>
                 </VBox>
             </children>

@@ -32,6 +32,9 @@ public class PendingsController implements Observer<RequestEvent> {
     @FXML
     private TableColumn<Request, Void> deleteColumn;
 
+    @FXML
+    private Button refreshButton;
+
     /**
      * Set the service for the controller.
      * @param service the service to be set
@@ -69,6 +72,7 @@ public class PendingsController implements Observer<RequestEvent> {
 
         addViewProfileButtonToTable();
         addDeleteButtonToTable();
+        refreshButton.setOnAction(event -> loadPendings());
     }
 
     /**

@@ -22,10 +22,10 @@
                 <TableView fx:id="friendsTableView" prefHeight="200.0" prefWidth="254.0">
                     <columns>
                         <!-- Friend Username Column -->
-                        <TableColumn fx:id="friendUsernameColumn" prefWidth="140.0" text="Friend Username" />
+                        <TableColumn fx:id="friendUsernameColumn" prefWidth="116.59999692440033" text="Friend Username" />
 
                         <!-- Date Column -->
-                        <TableColumn fx:id="dateColumn" prefWidth="140.0" text="Friends since" />
+                        <TableColumn fx:id="dateColumn" prefWidth="164.19998931884766" text="Friends since" />
 
                         <!-- Delete Button Column -->
                         <TableColumn fx:id="deleteColumn" prefWidth="96.0" text="Action" />
