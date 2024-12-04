@@ -26,8 +26,9 @@ public class GUI extends Application {
         UserDBRepository userRepo = new UserDBRepository(new UserValidation());
         FriendshipDBRepository friendshipRepo = new FriendshipDBRepository(new FriendshipValidation());
         RequestDBRepository requestRepo = new RequestDBRepository(new RequestValidation());
+        MessageDBRepository messageRepo = new MessageDBRepository(new MessageValidation());
 
-        Service service = new Service(userRepo, friendshipRepo, requestRepo);
+        Service service = new Service(userRepo, friendshipRepo, requestRepo, messageRepo);
 
         openLoginWindow(primaryStage, service);
     }
@@ -86,6 +87,9 @@ public class GUI extends Application {
         // Set up the controller
         FriendsController friendsController = loader.getController();
         friendsController.setService(service);
+        friendsController.setOnMessage(() -> {
+            openMessageWindow((Stage) friendsView.getScene().getWindow(), service);
+        });
 
         return friendsView;
     }
@@ -166,6 +170,21 @@ public class GUI extends Application {
         });
 
         return profileView;
+    }
+
+    private AnchorPane loadMessageView(Service service) throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/app/toysocialnetwork/view/message-view.fxml"));
+
+        // Load the view
+        AnchorPane messageView = loader.load();
+
+        // Set up the controller
+        MessageController messageController = loader.getController();
+        User selectedUser = service.getUserById(service.getSelectedUserId())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        messageController.setService(service, selectedUser);
+
+        return messageView;
     }
 
     private void openUsersWindow(Stage stage, Service service) {
@@ -258,6 +277,23 @@ public class GUI extends Application {
         }
     }
 
+    private void openMessageWindow(Stage stage, Service service) {
+        try {
+            // add the message view to the stage, to the already existing tabs
+            AnchorPane messageView = loadMessageView(service);
+            Tab messageTab = new Tab("Message");
+            messageTab.setContent(messageView);
+            messageTab.setClosable(true);
+
+            TabPane tabPane = (TabPane) stage.getScene().getRoot();
+            tabPane.getTabs().add(messageTab);
+
+            // select the message tab
+            tabPane.getSelectionModel().select(messageTab);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     private void openLoginWindow(Stage primaryStage, Service service) {
         try {

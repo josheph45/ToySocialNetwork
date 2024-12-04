@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class FriendsController implements Observer<FriendshipEvent> {
+    private Runnable onMessage;
     private Service service;
     private final ObservableList<Friendship> friendsList = FXCollections.observableArrayList();
 
@@ -35,6 +36,9 @@ public class FriendsController implements Observer<FriendshipEvent> {
     private TableColumn<Friendship, LocalDateTime> dateColumn;
 
     @FXML
+    private TableColumn<Friendship, Void> messageColumn;
+
+    @FXML
     private TableColumn<Friendship, Void> deleteColumn;
 
     /**
@@ -46,6 +50,14 @@ public class FriendsController implements Observer<FriendshipEvent> {
         this.service = service;
         this.service.addFriendshipObserver(this);
         loadFriendships();
+    }
+
+    /**
+     * Set the onMessage runnable
+     * @param onMessage the runnable to be set
+     */
+    public void setOnMessage(Runnable onMessage) {
+        this.onMessage = onMessage;
     }
 
     /**
@@ -73,6 +85,7 @@ public class FriendsController implements Observer<FriendshipEvent> {
                 new SimpleObjectProperty<>(cellData.getValue().getFriendsFrom())
         );
 
+        addMessageButtonToTable();
         addDeleteButtonToTable();
 
         filterUsernameField.textProperty().addListener((observable, oldValue, newValue) -> filterFriendships());
@@ -123,10 +136,46 @@ public class FriendsController implements Observer<FriendshipEvent> {
     }
 
     /**
+     * Add a message button to the table view.
+     */
+    @FXML
+    public void addMessageButtonToTable() {
+        messageColumn.setCellFactory(param -> new TableCell<Friendship, Void>() {
+            private final Button messageButton = new Button("Message");
+            {
+                messageButton.setOnAction(event -> {
+                    Friendship friendship = getTableView().getItems().get(getIndex());
+                    Long currentUserId = service.getCurrentUserId();
+                    Long friendId = friendship.getUser1Id().equals(currentUserId)
+                            ? friendship.getUser2Id()
+                            : friendship.getUser1Id();
+                    service.setSelectedUserId(friendId);
+                    if (onMessage != null) {
+                        onMessage.run();
+                    } else {
+                        System.err.println("Error: onMessage is not set!");
+                    }
+                });
+            }
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setGraphic(null);
+                } else {
+                    setGraphic(messageButton);
+                }
+            }
+        });
+    }
+
+    /**
      * Add a delete button to the table view.
      * The button is added to the last column of the table view.
      */
-    private void addDeleteButtonToTable() {
+    @FXML
+    public void addDeleteButtonToTable() {
         deleteColumn.setCellFactory(param -> new TableCell<Friendship, Void>() {
             private final Button deleteButton = new Button("Delete");
             {

@@ -79,6 +79,9 @@ public class LoginController {
         }
     }
 
+    /**
+     * Show a notification if the current user has friend requests
+     */
     private void showFriendRequestNotification() {
         Long currentUserId = service.getCurrentUserId();
         Iterable<Request> requests = service.getRequestsByReceiver(currentUserId);

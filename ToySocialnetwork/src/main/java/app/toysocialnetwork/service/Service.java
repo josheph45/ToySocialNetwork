@@ -1,33 +1,32 @@
 package app.toysocialnetwork.service;
 
+import app.toysocialnetwork.domain.Message;
 import app.toysocialnetwork.domain.Friendship;
 import app.toysocialnetwork.domain.Request;
 import app.toysocialnetwork.domain.User;
-import app.toysocialnetwork.repository.database.FriendshipDBRepository;
-import app.toysocialnetwork.repository.database.RequestDBRepository;
-import app.toysocialnetwork.repository.database.UserDBRepository;
-import app.toysocialnetwork.utils.event.EventEnum;
-import app.toysocialnetwork.utils.event.FriendshipEvent;
-import app.toysocialnetwork.utils.event.RequestEvent;
-import app.toysocialnetwork.utils.event.UserEvent;
+import app.toysocialnetwork.repository.database.*;
+import app.toysocialnetwork.utils.event.*;
 import app.toysocialnetwork.utils.observer.FriendshipObservable;
 import app.toysocialnetwork.utils.observer.Observer;
 import app.toysocialnetwork.utils.observer.RequestObservable;
 import app.toysocialnetwork.utils.observer.UserObservable;
+import app.toysocialnetwork.utils.observer.MessageObservable;
 
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-public class Service implements UserObservable, FriendshipObservable, RequestObservable {
+public class Service implements UserObservable, FriendshipObservable, RequestObservable, MessageObservable {
     private final UserDBRepository userRepo;
     private final FriendshipDBRepository friendshipRepo;
     private final RequestDBRepository requestRepo;
+    private final MessageDBRepository messageRepo;
 
     private final List<Observer<UserEvent>> userObserver;
     private final List<Observer<FriendshipEvent>> friendshipObserver;
     private final List<Observer<RequestEvent>> requestObserver;
+    private final List<Observer<MessageEvent>> messageObserver;
 
     private Long currentUserId;
     private Long selectedUserId;
@@ -43,15 +42,19 @@ public class Service implements UserObservable, FriendshipObservable, RequestObs
      * repositoryFriendship must not be null
      * @param repositoryRequest - the repository for requests
      * repositoryRequest must not be null
+     * @param messageRepo - the repository for messages
+     * messageRepo must not be null
      */
-    public Service(UserDBRepository repositoryUser, FriendshipDBRepository repositoryFriendship, RequestDBRepository repositoryRequest) {
+    public Service(UserDBRepository repositoryUser, FriendshipDBRepository repositoryFriendship, RequestDBRepository repositoryRequest, MessageDBRepository messageRepo) {
         this.userRepo = repositoryUser;
         this.friendshipRepo = repositoryFriendship;
         this.requestRepo = repositoryRequest;
+        this.messageRepo = messageRepo;
 
         this.userObserver = new ArrayList<>();
         this.friendshipObserver = new ArrayList<>();
         this.requestObserver = new ArrayList<>();
+        this.messageObserver = new ArrayList<>();
 
         initializeCounters();
     }
@@ -63,6 +66,7 @@ public class Service implements UserObservable, FriendshipObservable, RequestObs
         userRepo.findAll().forEach(user -> userIdCounter = Math.max(userIdCounter, user.getId() + 1));
         friendshipRepo.findAll().forEach(friendship -> friendshipIdCounter = Math.max(friendshipIdCounter, friendship.getId() + 1));
         requestRepo.findAll().forEach(request -> requestIdCounter = Math.max(requestIdCounter, request.getId() + 1));
+        messageRepo.findAll().forEach(message -> message.setId(message.getId() + 1));
     }
 
     /**
@@ -233,8 +237,23 @@ public class Service implements UserObservable, FriendshipObservable, RequestObs
      * @return an {@code Optional} encapsulating the updated friendship
      */
     public Optional<Friendship> deleteFriendship(Long friendshipId) {
-        Optional<Friendship> deletedFriendship = friendshipRepo.delete(friendshipId);
-        deletedFriendship.ifPresent(f -> notifyFriendshipObservers(new FriendshipEvent(EventEnum.DELETE, f)));
+        Optional<Friendship> deletedFriendship = friendshipRepo.findOne(friendshipId);
+
+        deletedFriendship.ifPresent(f -> {
+            // Retrieve the users involved in the friendship
+            Long userId1 = f.getUser1Id(); // Assuming Friendship has user1 and user2 as references
+            Long userId2 = f.getUser2Id(); // Assuming Friendship has user2 as references
+
+            // Delete all messages between the two users
+            deleteMessagesBetweenUsers(userId1, userId2);
+
+            // Proceed with deleting the friendship
+            friendshipRepo.delete(friendshipId);
+
+            // Notify observers about the friendship deletion
+            notifyFriendshipObservers(new FriendshipEvent(EventEnum.DELETE, f));
+        });
+
         return deletedFriendship;
     }
 
@@ -368,6 +387,93 @@ public class Service implements UserObservable, FriendshipObservable, RequestObs
         });
     }
 
+
+
+
+
+    // Message-related methods
+
+    /**
+     * Get all messages
+     * @return an {@code Iterable} encapsulating all messages
+     */
+    public Iterable<Message> getMessages() {
+        return messageRepo.findAll();
+    }
+
+    /**
+     * Get all messages between two users
+     *
+     */
+    public Iterable<Message> getMessagesBetweenUsers(Long userId1, Long userId2) {
+        return StreamSupport.stream(getMessages().spliterator(), false)
+                .filter(message -> (message.getFrom().equals(userId1) && message.getTo().equals(userId2)) ||
+                        (message.getFrom().equals(userId2) && message.getTo().equals(userId1)))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Add a message
+     * @param from - the id of the user who sent the message
+     * from must not be null
+     * @param to - the id of the user who received the message
+     * to must not be null
+     * @param text - the text of the message
+     * text must not be null
+     * @return an {@code Optional} encapsulating the added message
+     */
+    public Optional<Message> addMessage(Long from, Long to, String text) {
+        Message message = new Message(from, to, text, LocalDateTime.now());
+        message.setId(messageRepo.findAll().spliterator().getExactSizeIfKnown() + 1);
+        Optional<Message> savedMessage = messageRepo.save(message);
+        savedMessage.ifPresent(m -> notifyMessageObservers(new MessageEvent(EventEnum.ADD, m)));
+        return savedMessage;
+    }
+
+    /**
+     * Update a message
+     * @param message - the message to be updated
+     * message must not be null
+     * @return an {@code Optional} encapsulating the updated message
+     */
+    public Optional<Message> updateMessage(Message message) {
+        Optional<Message> updatedMessage = messageRepo.update(message);
+        updatedMessage.ifPresent(m -> notifyMessageObservers(new MessageEvent(EventEnum.UPDATE, m)));
+        return updatedMessage;
+    }
+
+    /**
+     * Delete a message
+     * @param messageId - the id of the message to be deleted
+     * messageId must not be null
+     * @return an {@code Optional} encapsulating the deleted message
+     */
+    public Optional<Message> deleteMessage(Long messageId) {
+        Optional<Message> deletedMessage = messageRepo.delete(messageId);
+        deletedMessage.ifPresent(m -> notifyMessageObservers(new MessageEvent(EventEnum.DELETE, m)));
+        return deletedMessage;
+    }
+
+    /**
+     * Delete all messages between two users
+     * @param userId1 - the id of the first user
+     * userId1 must not be null
+     * @param userId2 - the id of the second user
+     * userId2 must not be null
+     */
+    public void deleteMessagesBetweenUsers(Long userId1, Long userId2) {
+        getMessages().forEach(message -> {
+            if ((message.getFrom().equals(userId1) && message.getTo().equals(userId2)) ||
+                    (message.getFrom().equals(userId2) && message.getTo().equals(userId1))) {
+                deleteMessage(message.getId());
+            }
+        });
+    }
+
+
+
+
+
     // Observer-related methods for users
 
     /**
@@ -462,5 +568,37 @@ public class Service implements UserObservable, FriendshipObservable, RequestObs
     @Override
     public void notifyRequestObservers(RequestEvent event) {
         requestObserver.forEach(observer -> observer.update(event));
+    }
+
+    // Observer-related methods for messages
+
+    /**
+     * Add an observer for messages
+     * @param observer - the observer to be added
+     * observer must not be null
+     */
+    @Override
+    public void addMessageObserver(Observer<MessageEvent> observer) {
+        messageObserver.add(observer);
+    }
+
+    /**
+     * Remove an observer for messages
+     * @param observer - the observer to be removed
+     * observer must not be null
+     */
+    @Override
+    public void removeMessageObserver(Observer<MessageEvent> observer) {
+        messageObserver.remove(observer);
+    }
+
+    /**
+     * Notify all message observers
+     * @param event - the event to be sent to the observers
+     * event must not be null
+     */
+    @Override
+    public void notifyMessageObservers(MessageEvent event) {
+        messageObserver.forEach(observer -> observer.update(event));
     }
 }

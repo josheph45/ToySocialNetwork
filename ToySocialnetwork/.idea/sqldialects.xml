@@ -2,6 +2,7 @@
 <project version="4">
   <component name="SqlDialectMappings">
     <file url="file://$PROJECT_DIR$/src/main/java/app/toysocialnetwork/repository/database/FriendshipDBRepository.java" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/src/main/java/app/toysocialnetwork/repository/database/MessageDBRepository.java" dialect="GenericSQL" />
     <file url="file://$PROJECT_DIR$/src/main/java/app/toysocialnetwork/repository/database/UserDBRepository.java" dialect="GenericSQL" />
   </component>
 </project>
